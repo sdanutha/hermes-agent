@@ -1,7 +1,7 @@
 """Shared harness for the OpenAI-dialect provider wire-conformance suite.
 
 Every test drives REAL Hermes processes (``hermes -z`` oneshot, ``--resume``, the
-``tui_gateway`` stdio server) against a loopback fake of the vendor HTTP API
+``hermes_runtime`` stdio server) against a loopback fake of the vendor HTTP API
 (``tests/fakes/providers``) and asserts on the next wire request Hermes sends, the
 user-visible answer, and persisted ``state.db`` rows. Homes are hermetic: a fake HOME
 whose ``.hermes`` is the HERMES_HOME, an allowlisted env with no credentials.

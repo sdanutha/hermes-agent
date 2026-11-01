@@ -537,17 +537,6 @@ class GatewayTurnPrepareMixin:
         # surfaces: it never appended this note, and mark_seen would rewrite config.yaml under
         # an ordinary launch that promises to leave the profile's files untouched.
         human_platform = bool(source.platform) and source.platform not in (Platform.LOCAL, Platform.WEBHOOK)
-        if human_platform and source.chat_type == "dm" and not await self.async_session_store.has_any_sessions():
-            # Same branch logic as the TUI (profile-build offer once when "ask", else plain intro);
-            # first_contact_turn_note already falls back to the plain intro on error.
-            from agent.onboarding import first_contact_turn_note
-            note = first_contact_turn_note(
-                _load_gateway_config(), _gateway_config_home() / "config.yaml",
-                session_history_empty=True, install_has_prior_sessions=False,
-            )
-            if note:
-                turn_sidecar_notes.append(note)
-
         # One-time prompt if no home channel is set (webhooks deliver to configured targets instead).
         if not human_platform:
             return

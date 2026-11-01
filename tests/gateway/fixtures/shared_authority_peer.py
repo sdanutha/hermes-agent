@@ -55,7 +55,7 @@ async def probe():
     from gateway.platforms.event import MessageEvent
     from gateway.run import GatewayRunner
     from gateway.session import SessionSource
-    from tui_gateway import server
+    from hermes_runtime import server
     from run_agent import AIAgent
     from shared_authority_recovery import prepare_crash, recover_probe, verify_envelope_guards
     from tests.waiting import async_wait_until

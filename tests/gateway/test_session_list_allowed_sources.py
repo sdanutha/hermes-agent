@@ -15,7 +15,7 @@ History:
 
 from __future__ import annotations
 
-from tui_gateway import server
+from hermes_runtime import server
 
 
 class _StubDB:

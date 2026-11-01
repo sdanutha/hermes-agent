@@ -174,7 +174,7 @@ def test_a_policy_stored_before_the_field_restores_as_ask_with_its_identity_unch
     ('.git/config', 'session', True),             # ... a sensitive path still asks
 ])
 async def test_the_owners_edit_guard_enforces_the_sessions_policy(tmp_path, name, policy, asks):
-    from acp_adapter.edit_approval import maybe_require_edit_approval
+    from hermes_runtime.edit_approval import maybe_require_edit_approval
     from gateway.session_policy import build_policy, policy_scope
     from tools.approval import register_gateway_notify, unregister_gateway_notify
     from tools.approval_context import reset_current_session_key, set_current_session_key

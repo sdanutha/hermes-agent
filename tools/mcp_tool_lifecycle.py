@@ -80,7 +80,7 @@ def _snapshot_child_pids() -> set:
 # MCP spawn (defense-in-depth; LSP/slash_worker already use start_new_session). Matched against
 # argv[1:] because Python/Java children start with the interpreter path.
 _NON_MCP_CHILD_CMDLINE_MARKERS: tuple[str, ...] = (
-    "tui_gateway.slash_worker", "tui_gateway.entry",
+    "hermes_runtime.slash_worker", "hermes_runtime.entry",
     "-dorg.eclipse.equinox.launcher", "eclipse.jdt.ls", "org.eclipse.equinox.launcher_",  # jdtls
 )
 

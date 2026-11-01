@@ -2,11 +2,11 @@
 
 The top-level ``from prompt_toolkit.patch_stdout import patch_stdout`` was unguarded,
 so a partial/broken prompt_toolkit install (e.g. a stale venv that has the package but
-not every submodule) crashed the import chain — including ``tui_gateway.slash_worker``,
+not every submodule) crashed the import chain — including ``hermes_runtime.slash_worker``,
 which imports ``cli`` in every gateway session. The only use site is a
 ``with patch_stdout():`` block, so a ``nullcontext`` fallback preserves behaviour.
 
-Modeled on tests/tui_gateway/test_slash_worker_sys_path.py's subprocess pattern.
+Modeled on tests/hermes_runtime/test_slash_worker_sys_path.py's subprocess pattern.
 """
 
 from __future__ import annotations

@@ -77,7 +77,7 @@ def _render_gateway() -> str:
 
 
 def _render_tui() -> str:
-    from tui_gateway import server
+    from hermes_runtime import server
 
     class _DB:
         def get_session(self, key):

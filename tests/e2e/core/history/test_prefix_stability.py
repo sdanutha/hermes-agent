@@ -1,7 +1,7 @@
 """C17 prompt-cache prefix byte-stability + usage accounting across REAL processes and surfaces.
 
 One durable session is driven for 10+ turns through fresh processes of the real entrypoints that
-can continue it — the ``tui_gateway`` stdio JSON-RPC server (what the TUI/Desktop spawn) and the
+can continue it — the ``hermes_runtime`` stdio JSON-RPC server (what the TUI/Desktop spawn) and the
 ``hermes chat -q --resume`` oneshot CLI — switching process and working directory between turns,
 with a parallel tool batch and (gateway journeys) one manual ``session.compress`` on the way.
 
@@ -49,7 +49,7 @@ Hop = tuple[str, str, list[str]]
 
 JOURNEYS: dict[str, list[Hop]] = {
     # Same surface, four gateway processes, two cwds, compaction mid-way, resume after it.
-    "tui_gateway_restarts": [
+    "hermes_runtime_restarts": [
         ("gw", "a", ["gw1 first turn", "TOOLS:gw1 runs a parallel batch", "gw1 third turn"]),
         ("gw", "b", ["gw2 resumed turn", "gw2 another turn"]),
         ("gw", "a", ["gw3 turn before compress", "/compress", "gw3 turn after compress", "gw3 more"]),

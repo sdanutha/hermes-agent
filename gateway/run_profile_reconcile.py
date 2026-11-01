@@ -376,7 +376,7 @@ class GatewayProfileReconcileMixin:
                 return False  # shutdown began during the preflight await
             from hermes_constants import hermes_home_key
             from tools.mcp_tool_scope import rekey_unscoped_connections
-            from tui_gateway.launch_profile_policy import activate_multi_profile_hosting
+            from hermes_runtime.launch_profile_policy import activate_multi_profile_hosting
             activate_multi_profile_hosting()
             rekey_unscoped_connections(hermes_home_key(launch))
             self.config.multiplex_profiles = True

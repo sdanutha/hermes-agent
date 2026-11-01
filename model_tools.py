@@ -151,7 +151,7 @@ discover_builtin_tools()
 
 # MCP discovery is deliberately NOT run here: it blocks up to 120 s and the
 # gateway lazy-imports this module inside its event loop; each entry point
-# (gateway/run.py, cli.py, tui_gateway, acp_adapter) runs it at startup.
+# (gateway/run.py, cli.py, hermes_runtime, acp_adapter) runs it at startup.
 try:  # plugin tool discovery (user/project/pip plugins)
     # MCP tool discovery (external MCP servers from config) used to run here as a module-level side effect.
     # It was removed because discover_mcp_tools() internally uses a blocking future.result(timeout=120)
@@ -790,7 +790,7 @@ def _pre_dispatch_guards(function_name: str, function_args: dict[str, Any], skip
     # ACP/Zed edit approval before any file mutation. The requester is bound
     # via ContextVar only for ACP sessions, so CLI/gateway paths are unaffected.
     try:
-        from acp_adapter.edit_approval import maybe_require_edit_approval
+        from hermes_runtime.edit_approval import maybe_require_edit_approval
         edit_block_message = maybe_require_edit_approval(function_name, function_args)
         if edit_block_message is not None:
             return function_args, (edit_block_message, "edit_approval_denied", None)

@@ -63,7 +63,7 @@ def test_chat_q_non_ascii_reply_printed_intact(tmp_path: Path) -> None:
     assert f"{REPLY} {tag}" in res.stdout, f"reply printed with its non-ASCII mangled: {res.stdout[-500:]!r}"
 
 
-def test_tui_gateway_utf8_frames_reach_wire(tmp_path: Path) -> None:
+def test_hermes_runtime_utf8_frames_reach_wire(tmp_path: Path) -> None:
     tag = nonce("TUI")
     with FakeLLMServer([Text(f"{REPLY} {tag}")]) as srv:
         home = make_home(tmp_path, srv.base_url)

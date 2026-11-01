@@ -191,7 +191,7 @@ def _spawn_catalog_swr_refresh(url: str) -> None:
                 _catalog_swr_inflight.discard(inflight_key)
 
     # copy_context: the picker may be serving a profile scoped by the HERMES_HOME ContextVar
-    # (tui_gateway ``_profile_scoped``), so the worker must write THAT profile's cache file.
+    # (hermes_runtime ``_profile_scoped``), so the worker must write THAT profile's cache file.
     context = contextvars.copy_context()
     threading.Thread(target=lambda: context.run(_refresh), daemon=True, name="model-catalog-swr").start()
 

@@ -1,7 +1,7 @@
 """Exact operator controls for canonical hosted attempts, never legacy replay."""
 from gateway import hosted_room_driver as tasks
 from hermes_state_runtime import RuntimeStoreError
-from tui_gateway.hosted_room_driver import HostedRoomBinding
+from hermes_runtime.hosted_room_driver import HostedRoomBinding
 
 
 class HostedControls:

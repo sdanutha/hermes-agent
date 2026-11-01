@@ -2,7 +2,7 @@
 
 LocalSessionAdapter.send publishes nothing (TurnRunner owns the canonical stream), so the
 "💾 Self-improvement review: …" line handed to the status adapter reached no Desktop/TUI
-viewer once every local turn ran through the session authority. The in-process tui_gateway
+viewer once every local turn ran through the session authority. The in-process hermes_runtime
 emitted it as ``review.summary``; the authority route must publish the same frame.
 """
 from __future__ import annotations

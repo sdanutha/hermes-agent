@@ -44,9 +44,9 @@ _hermes_write: ContextVar[bool] = ContextVar("hermes_feature_disabled_hermes_wri
 
 def set_process_surface(command: Any) -> None:
     """Called once by the ``hermes`` dispatch (``command`` is the subcommand, None for chat) or the
-    TUI gateway (``"tui_gateway"``). Unknown commands clear it."""
+    TUI gateway (``"hermes_runtime"``). Unknown commands clear it."""
     global _process_surface
-    _process_surface = "tui_gateway" if command == "tui_gateway" else _COMMAND_SURFACES.get(command)
+    _process_surface = "hermes_runtime" if command == "hermes_runtime" else _COMMAND_SURFACES.get(command)
 
 
 def current_surface() -> str | None:
@@ -55,9 +55,9 @@ def current_surface() -> str | None:
         from .shared_metrics_setup import web_setup_surface
 
         return web_setup_surface()
-    if surface == "tui_gateway":
+    if surface == "hermes_runtime":
         try:
-            from tui_gateway.server import _resolve_session_platform
+            from hermes_runtime.server import _resolve_session_platform
 
             return _resolve_session_platform()
         except Exception:

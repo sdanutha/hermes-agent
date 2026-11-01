@@ -443,7 +443,7 @@ def _merge_mcp_into_per_job_toolsets(per_job: list[str], cfg: dict) -> list[str]
     if "no_mcp" in per_job:
         return result
     # lazy: avoid heavy hermes_cli import at module load; shares MCP-membership with gateway/CLI
-    from hermes_cli.tools_config import enabled_mcp_server_names
+    from hermes_cli.tool_selection import enabled_mcp_server_names
     enabled_mcp = enabled_mcp_server_names(cfg)
     if set(result) & enabled_mcp:
         return result
@@ -478,7 +478,7 @@ def _resolve_cron_enabled_toolsets(job: dict, cfg: dict) -> list[str]:
             return []
         return _merge_mcp_into_per_job_toolsets(list(per_job), cfg or {})
     try:
-        from hermes_cli.tools_config import _get_platform_tools  # lazy: avoid heavy import at cron module load
+        from hermes_cli.tool_selection import _get_platform_tools  # lazy: avoid heavy import at cron module load
         return sorted(_get_platform_tools(cfg or {}, "cron"))
     except Exception as exc:
         raise RuntimeError(
@@ -3229,7 +3229,7 @@ def _install_fire_secret_scope() -> tuple[contextvars.Token, Optional[contextvar
     from agent.secret_scope import set_multiplex_context, set_secret_scope
     from cron.scheduler_provider import routed_profile_fire
     from hermes_cli.env_loader import hydrate_profile_secret_sources
-    from tui_gateway.launch_profile_policy import owner_secret_scope
+    from hermes_runtime.launch_profile_policy import owner_secret_scope
 
     home = Path(_get_hermes_home())
     hydrate_profile_secret_sources(home)

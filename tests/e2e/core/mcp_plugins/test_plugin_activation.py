@@ -4,7 +4,7 @@ Every test drives a real Hermes process against the recording fake LLM and the r
 fixture server, launched from a portable package under ``<HERMES_HOME>/plugins/<dir>/``:
 
 * live activation: a plugin enabled over the Plugins Hub RPC (``plugins.manage toggle``) while a
-  chat is open in the ``tui_gateway`` host (the Ink TUI / Desktop backend) is usable in that SAME
+  chat is open in the ``hermes_runtime`` host (the Ink TUI / Desktop backend) is usable in that SAME
   chat on its next turn (the call reaches the server, its canary reaches the model), the open
   chat's model-facing ``tools[]`` stays byte-identical (prompt-cache invariant: MCP tools go live
   deferred behind ``tool_call``), and a new chat gets the tool too;

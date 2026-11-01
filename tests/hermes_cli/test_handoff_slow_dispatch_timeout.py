@@ -15,7 +15,7 @@ Fix under test:
      rows still in the given states.
   2. CLI _handle_handoff_command: 60s deadline applies only to PENDING;
      a RUNNING row gets a long (15 min) wait and is never failed by the CLI.
-  3. tui_gateway handoff.fail: only pending rows can be failed by Desktop.
+  3. hermes_runtime handoff.fail: only pending rows can be failed by Desktop.
 """
 
 from __future__ import annotations
@@ -218,7 +218,7 @@ class TestDesktopHandoffFail:
         """Invoke the handoff.fail handler body with server-global stand-ins."""
         import contextlib
 
-        from tui_gateway import methods_session as ms
+        from hermes_runtime import methods_session as ms
 
         handler = None
         for name, fn in ms._registry._pending:

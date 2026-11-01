@@ -91,7 +91,7 @@ on an "existing config" signal (`_explicitly_configured`) so existing users keep
 
 **Lifecycle hooks fire under the owning profile's scope, and the caller binds it.**
 `on_session_start`/`on_session_end`/`sync_turn`/`shutdown` are invoked from the turn (bound) AND
-from eviction, shutdown, `tui_gateway` teardown and cron completion (bound by the caller via
+from eviction, shutdown, `hermes_runtime` teardown and cron completion (bound by the caller via
 `_run_release_in_profile_scope`, `_session_profile_runtime_scope`, `_profile_cron_scope`). One
 process serves several profiles, so a provider never caches `hermes_home` from `initialize()` as
 "the" home — key state by the home it is handed per call (`hermes_home_key()`) — and never reads

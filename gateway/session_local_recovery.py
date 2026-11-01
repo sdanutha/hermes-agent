@@ -323,7 +323,7 @@ def reopen_local_session(authority, ref):
     disconnect / idle eviction stamps ``end_reason`` on the physical row. ``SessionStore`` reads any
     stamped row as a stale route (#54878) and, since those reasons are not recoverable, answers the
     turn with a FRESH session — the client keeps waiting on an id that never emits again. The classic
-    surfaces clear the stamp on the first real turn (tui_gateway ``_reopen_if_finalized``); the
+    surfaces clear the stamp on the first real turn (hermes_runtime ``_reopen_if_finalized``); the
     authority must too. Only the lineage tip is reopened: a
     compression parent or reset predecessor is never the physical target.
     """

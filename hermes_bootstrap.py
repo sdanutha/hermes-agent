@@ -341,7 +341,7 @@ def install_never_free_environ() -> None:
     still be walking it; the freed slots hold tcache pointers, so the walk segfaults the
     whole process. Hermes writes new names at runtime from many places (``session.create``
     turns on gateway prompts, the agent build sets ``HERMES_SESSION_ID``) while background
-    threads fetch catalogs, so the tui_gateway died with SIGSEGV. This is glibc 2.41's own
+    threads fetch catalogs, so the hermes_runtime died with SIGSEGV. This is glibc 2.41's own
     fix: entry strings are cached per ``NAME=value`` and never freed; a new name is
     appended in place to an array with spare room, and only a full array is replaced by
     a bigger one, the old one kept forever. Set/del churn of the same names therefore

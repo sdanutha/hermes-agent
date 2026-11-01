@@ -10,7 +10,7 @@ Proven here:
 
 * encrypted reasoning items are replayed verbatim, in output order, on the next API call
   of the same turn, on the next user turn after a process restart (``--resume`` from
-  state.db), and across turns of one long-lived ``tui_gateway`` session;
+  state.db), and across turns of one long-lived ``hermes_runtime`` session;
 * parallel ``function_call`` items round-trip: every call gets exactly one
   ``function_call_output`` with its own ``call_id`` and its own result, persisted once;
 * a stale encrypted blob rejected with HTTP 400 ``invalid_encrypted_content`` is
@@ -171,7 +171,7 @@ def test_rejected_encrypted_replay_is_stripped_and_primary_retried(tmp_path, rej
         assert run.proc.returncode == 0 and _answer(run) == "RECOVERED-ON-PRIMARY", run.describe()
 
 
-def test_tui_gateway_session_replays_reasoning_across_turns(tmp_path) -> None:
+def test_hermes_runtime_session_replays_reasoning_across_turns(tmp_path) -> None:
     """One long-lived backend (the Desktop/TUI shape): turn 2's request carries turn 1's
     blob without any restart, and the fallback chat endpoint is never touched."""
     h = Home(tmp_path)

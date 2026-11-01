@@ -1,7 +1,7 @@
 """Anthropic Messages wire conformance: thinking signatures + tool pairing.
 
 Real ``hermes`` processes (``-z``, ``chat -q``, ``chat --resume``, the stdio
-``tui_gateway``) talk to the SDK-oracle fake on the production native route.
+``hermes_runtime``) talk to the SDK-oracle fake on the production native route.
 Each test asserts the NEXT wire request Hermes sends: signed thinking blocks
 come back byte-exact (text AND signature), parallel ``tool_use`` ids are each
 answered in the very next user message, and every request body validates
@@ -135,10 +135,10 @@ def _unsigned(messages: list[dict]) -> list[dict]:
     return [{**m, "content": [b for b in m["content"] if b.get("type") != "thinking"]} for m in messages]
 
 
-def _tui_gateway_two_turns(rig: Rig, prompts: list[str]) -> list[str]:
+def _hermes_runtime_two_turns(rig: Rig, prompts: list[str]) -> list[str]:
     from tests.e2e.core.parity._drive_rpc import RpcClient, StreamCapture
 
-    proc = subprocess.Popen([sys.executable, "-m", "tui_gateway.entry"], cwd=rig.project, env=rig.env(),
+    proc = subprocess.Popen([sys.executable, "-m", "hermes_runtime.entry"], cwd=rig.project, env=rig.env(),
                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             text=True, bufsize=1)
     cap = StreamCapture().start(proc)
@@ -161,7 +161,7 @@ def _tui_gateway_two_turns(rig: Rig, prompts: list[str]) -> list[str]:
                                   and sum(1 for x in rpc.events if x.get("type") == "message.complete") >= n)
             answers.append(str((done.get("payload") or {}).get("text")))
     except (AssertionError, queue.Empty) as exc:
-        raise AssertionError(f"{exc}\ntui_gateway stderr: {cap.stderr[-2000:]}") from exc
+        raise AssertionError(f"{exc}\nhermes_runtime stderr: {cap.stderr[-2000:]}") from exc
     finally:
         if proc.stdin is not None and not proc.stdin.closed:
             proc.stdin.close()
@@ -172,14 +172,14 @@ def _tui_gateway_two_turns(rig: Rig, prompts: list[str]) -> list[str]:
     return answers
 
 
-def test_tui_gateway_replays_signed_thinking_across_turns(rig_factory) -> None:
+def test_hermes_runtime_replays_signed_thinking_across_turns(rig_factory) -> None:
     """The Ink TUI / Desktop backend path: two prompts in one live session over stdio JSON-RPC.
     The second prompt's request replays turn 1's signed thinking byte-exact."""
     rig = rig_factory([
         Reply([Thinking(THINK["A"], SIG["A"]), Text("GW-ONE")]),
         Reply([Thinking(THINK["D"], SIG["D"]), Text("GW-TWO")]),
     ])
-    answers = _tui_gateway_two_turns(rig, ["first question", "second question"])
+    answers = _hermes_runtime_two_turns(rig, ["first question", "second question"])
     assert "GW-ONE" in answers[0] and "GW-TWO" in answers[1], answers
     _assert_conformant(rig)
     mains = [r["body"] for r in rig.srv.main_requests()]

@@ -7,7 +7,7 @@ emitted reach the user's surface BEFORE the turn completes, so a long turn never
 
 Two real surfaces, each timestamped against the fake's own clock (same host):
 
-* the Desktop/TUI event stream (``python -m tui_gateway.entry`` over stdio): ``reasoning.delta`` /
+* the Desktop/TUI event stream (``python -m hermes_runtime.entry`` over stdio): ``reasoning.delta`` /
   ``message.delta`` events carrying the agent's text (#120550);
 * ACP composition — Hermes itself served as an ACP agent (``hermes acp``) on top of the copilot-acp
   provider: the outer client must get ``session/update`` chunks before the inner turn ends (#101507).
@@ -149,7 +149,7 @@ def _home(root: Path) -> tuple[NativeHome, acp.AcpFake]:
     return make_home(root, {"provider": "copilot-acp", "default": "copilot-acp"}, env_file=fake.env()), fake
 
 
-def _tui_gateway(root: Path) -> Observed:
+def _hermes_runtime(root: Path) -> Observed:
     nh, fake = _home(root)
 
     def drive(rpc: _LineRpc) -> str:
@@ -162,7 +162,7 @@ def _tui_gateway(root: Path) -> Observed:
         done = rpc.until(event("message.complete"))
         return str((done["params"].get("payload") or {}).get("text") or "")
 
-    return _run_child([sys.executable, "-m", "tui_gateway.entry"], nh, fake, drive)
+    return _run_child([sys.executable, "-m", "hermes_runtime.entry"], nh, fake, drive)
 
 
 def _nested_acp(root: Path) -> Observed:
@@ -188,7 +188,7 @@ def _chunk_text(msg: dict[str, Any]) -> str:
     return ""
 
 
-SURFACES: dict[str, Callable[[Path], Observed]] = {"tui_stream": _tui_gateway, "nested_acp": _nested_acp}
+SURFACES: dict[str, Callable[[Path], Observed]] = {"tui_stream": _hermes_runtime, "nested_acp": _nested_acp}
 
 
 @pytest.fixture(scope="module")

@@ -10,7 +10,7 @@ live once and caches that. A *stamp* the caller passes (the files the answer rea
 no writer in this process saw, such as a key typed into ``.env`` by hand. It is taken before and
 after each computation, and an answer is cached only when the files held still in between: one
 computed while a key landed would otherwise sit under the new stamp. The computation itself lives
-with its caller (``tui_gateway``), which owns the default-profile scope it runs in.
+with its caller (``hermes_runtime``), which owns the default-profile scope it runs in.
 """
 
 from __future__ import annotations

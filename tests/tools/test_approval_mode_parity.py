@@ -5,7 +5,7 @@ must resolve identically on every surface that consults them:
 
   - the canonical core: ``tools.approval_context._get_approval_mode`` /
     ``tools.approval_context._get_approval_timeout``
-  - the TUI gateway: ``tui_gateway.server._load_approval_mode`` (delegates
+  - the TUI gateway: ``hermes_runtime.server._load_approval_mode`` (delegates
     to the core as of the decision-core migration)
   - the codex app-server surface: ``agent/codex_runtime.py`` feeds
     ``auto_approve_*`` from ``tools.approval.is_approval_bypass_active()``,
@@ -13,7 +13,7 @@ must resolve identically on every surface that consults them:
     ``is_approval_bypass_active() == (mode == "off")`` when no yolo
     source is active.
 
-Historic drift class: tui_gateway re-read config raw and normalized
+Historic drift class: hermes_runtime re-read config raw and normalized
 locally (see commits f9cd577915, 1e652cca7a, bd246db10d — repeated parity
 re-alignments). This test pins the invariant so drift regressions fail
 loudly instead of silently disagreeing per surface.
@@ -46,7 +46,7 @@ def tui_server():
             "hermes_cli.banner": MagicMock(),
         },
     ):
-        yield importlib.import_module("tui_gateway.server")
+        yield importlib.import_module("hermes_runtime.server")
 
 def _write_config(home, yaml_text: str | None) -> None:
     cfg = home / "config.yaml"

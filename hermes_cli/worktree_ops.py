@@ -27,7 +27,7 @@ logger = logging.getLogger("cli")
 
 
 def _cprint(text: str) -> None:
-    from cli import _cprint as _impl
+    from hermes_cli.runtime_text import _cprint as _impl
     _impl(text)
 
 

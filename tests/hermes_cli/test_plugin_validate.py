@@ -436,7 +436,7 @@ def test_runtime_rebind_of_hermes_core_fails_admission(tmp_path):
         "    m._PROVIDER_MODELS['x'] = ['y']\n"
     ))
     (bad / "compat.py").write_text(
-        "from importlib import import_module\ndef server():\n    return import_module('tui_gateway.server')\n",
+        "from importlib import import_module\ndef server():\n    return import_module('hermes_runtime.server')\n",
         encoding="utf-8")
     good = _make_plugin(tmp_path, manifest=dict(BASE_MANIFEST, name="good"), init_py=(
         "from hermes_cli.config import load_config\n"

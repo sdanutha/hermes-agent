@@ -62,7 +62,7 @@ SURFACES = (
     ("discord.claude", "discord", "claude", False),
     ("cron.claude", "cron", "claude", False),
 )
-# Desktop resolves toolsets in tui_gateway (client-surface toolsets folded in); the gateway, cron
+# Desktop resolves toolsets in hermes_runtime (client-surface toolsets folded in); the gateway, cron
 # and classic CLI read the platform toolsets directly.
 TUI_GATEWAY_PLATFORMS = ("desktop",)
 FIXED_NOW = datetime(2026, 1, 15, 12, 0, 0, tzinfo=UTC)
@@ -118,7 +118,7 @@ def _scrub(text: str, home: Path) -> str:
 
 def _enabled_toolsets(platform: str) -> list[str]:
     if platform in TUI_GATEWAY_PLATFORMS:
-        from tui_gateway.server import _load_enabled_toolsets
+        from hermes_runtime.server import _load_enabled_toolsets
         return list(_load_enabled_toolsets(platform) or [])
     from hermes_cli.config import load_config
     from hermes_cli.tools_config import _get_platform_tools

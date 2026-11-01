@@ -192,7 +192,7 @@ class _CatalogBackend:
         (``PUT /api/mcp/servers/{name}/enabled``): the two read-modify-write paths run in one
         process, so an unserialised write here drops whichever landed first."""
         from hermes_cli.config import load_config, save_config
-        from hermes_cli.web_routers._common import config_write_scope
+        from hermes_cli.runtime_config import config_write_scope
 
         with config_write_scope(None):
             config = load_config()

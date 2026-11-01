@@ -4,7 +4,7 @@ Petdex (https://github.com/crafter-station/petdex) is a public gallery of
 animated sprite "pets": a ``pet.json`` plus a ``spritesheet.{webp,png}`` of
 192×208 px cells (8-col × 9-row Codex atlas, or the older 8-row atlas). This
 package is the single source of truth for the feature so the CLI (Python) and
-TUI (Ink, via ``tui_gateway``) never duplicate the hard parts: ``constants``
+TUI (Ink, via ``hermes_runtime``) never duplicate the hard parts: ``constants``
 (geometry + :class:`PetState`), ``state`` (activity → state), ``manifest``,
 ``store`` (on-disk pets), ``render`` (kitty / iTerm2 / sixel / half-blocks).
 A pure display concern: no model tool, no prompt/toolset mutation, so zero

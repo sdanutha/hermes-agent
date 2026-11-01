@@ -170,7 +170,7 @@ def _compression_lock_holder_process_is_dead(holder: str) -> bool:
 
 # Billing buckets that aren't a routable provider identity: a session that persisted only
 # one of these (never ran /model) falls back to the config default. Shared by
-# session_gateway_runtime and tui_gateway.server so they cannot drift.
+# session_gateway_runtime and hermes_runtime.server so they cannot drift.
 _BARE_BILLING_PROVIDERS = frozenset({"auto", "custom"})
 
 T = TypeVar("T")
@@ -455,7 +455,7 @@ def _foreign_state_db_holders(db_path: Path) -> list[tuple[int, str]]:
 
 
 # ── Process-wide shared SessionDB registry (#90837) ── lives in hermes_state_registry.py (acquire /
-# release / close_all / release_or_close). Long-lived in-process callers (gateway, tui_gateway, cron,
+# release / close_all / release_or_close). Long-lived in-process callers (gateway, hermes_runtime, cron,
 # in-process tools) share ONE writer connection per resolved path via hermes_state_registry.acquire(); CLI
 # one-shots, recovery flows, and read-only cross-profile opens use SessionDB() directly with their own close().
 
@@ -1510,7 +1510,7 @@ class SessionDB(
         retires after an idle window and the atexit hook holds only a weak reference, so abandoned handles
         are eventually collectible — but "eventually, after the idle window and a GC cycle" is not a release
         policy. Call sites owning a handle are still expected to close it deterministically (see the
-        ownership comments in ``run_agent.py`` and ``tui_gateway/methods_session.py``).
+        ownership comments in ``run_agent.py`` and ``hermes_runtime/methods_session.py``).
         """
         return self
 

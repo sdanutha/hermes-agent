@@ -11,9 +11,9 @@ from gateway.browser_control_broker import (
 from hermes_cli import web_server
 import hermes_cli.web_server_chat as _web_server_chat
 from hermes_cli.dashboard_auth.ws_tickets import _reset_for_tests, mint_ticket
-from tui_gateway import server
-from tui_gateway.ws import WSTransport
-from tui_gateway.methods_browser_control import _broker_event_writer, _principal_digest
+from hermes_runtime import server
+from hermes_runtime.ws import WSTransport
+from hermes_runtime.methods_browser_control import _broker_event_writer, _principal_digest
 
 
 def _fake_ticket_ws(ticket):

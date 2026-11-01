@@ -2,7 +2,7 @@
 
 Issue class: the dashboard Chat tab talking to the wrong profile, or losing the conversation on a
 reconnect. Every cell runs the real ``hermes dashboard``, which
-spawns the real Ink TUI (``ui-tui/dist/entry.js``) and its ``tui_gateway`` under a real PTY; the
+spawns the real Ink TUI (``ui-tui/dist/entry.js``) and its ``hermes_runtime`` under a real PTY; the
 client is what the browser's xterm does (raw PTY bytes, the ``\\x1b[RESIZE:c;r]`` control frame, the
 SPA's ``?attach=`` keep-alive token, ``?profile=`` and a per-(profile) ``?channel=``). Each profile
 has its own fake provider that only accepts that profile's key and echoes the prompt's canary, so
@@ -17,7 +17,7 @@ Contract under test (``hermes_cli/web_routers/chat_ws.py::pty_ws`` + ``hermes_cl
 Not a cell: "dashboard shutdown leaves no TUI behind". It holds, but it cannot be made red from the
 dashboard side: with ``PtySessionRegistry.close_all`` disabled (and even with the child ignoring
 SIGHUP) the TUI still exits when the dying dashboard's PTY master closes (kernel hangup / EIO) and
-its ``tui_gateway`` exits on stdin EOF. The fixture still waits for every descendant to exit and
+its ``hermes_runtime`` exits on stdin EOF. The fixture still waits for every descendant to exit and
 fails the test (after an identity-checked kill) on any that outlives the dashboard, so a leak is
 reported and cannot poison later tests.
 """

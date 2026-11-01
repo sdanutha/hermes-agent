@@ -621,7 +621,7 @@ def _resolve_toolsets(params, config, source, safe_mode, coding_posture=False, b
     """Validate explicit toolsets and return the session's enabled toolset set. Without a pick, a
     *coding_posture* session runs ``focus_toolsets`` instead of the profile default while the profile
     stays on ``focus``; the gateway decides it, never the client."""
-    from hermes_cli.tools_config import _get_platform_tools, enabled_mcp_server_names
+    from hermes_cli.tool_selection import _get_platform_tools, enabled_mcp_server_names
     from hermes_cli.toolset_validation import saved_toolset_resolver
     from toolsets import validate_toolset
     explicit = params.get('toolsets')
@@ -668,7 +668,7 @@ def _resolve_toolsets(params, config, source, safe_mode, coding_posture=False, b
         enabled |= surface - (disabled - {'desktop_ui'})
     if safe_mode:
         # Plugin toolsets are user customizations; the safe worker never imports them.
-        from hermes_cli.tools_config import _get_plugin_toolset_keys
+        from hermes_cli.tool_selection import _get_plugin_toolset_keys
         enabled -= _get_plugin_toolset_keys()
     return enabled
 

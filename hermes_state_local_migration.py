@@ -28,7 +28,7 @@ def login_owned_by(row, subject):
     """Whether *subject* is the login a served remote backend stamped on this Desktop row.
 
     ``hermes serve`` stamps the WS-upgrade login as ``<provider>:<user id>``
-    (tui_gateway/session_transports.py). Unlike the Nous label that stamp IS an owner: once a
+    (hermes_runtime/session_transports.py). Unlike the Nous label that stamp IS an owner: once a
     login's dashboard writes reach the gateway as that login, reading it as no-owner let login bob
     rename, claim and delete alice's chats (#140183 review F1). So it adopts only for the caller
     whose authenticated subject spells exactly that label (``_login_label``: issuer-less logins

@@ -4,8 +4,8 @@ import logging
 import threading
 import uuid
 
-from tui_gateway import event_replay
-from tui_gateway.transport import FanoutTransport
+from hermes_runtime import event_replay
+from hermes_runtime.transport import FanoutTransport
 
 
 class SessionEvents:

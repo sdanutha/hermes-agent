@@ -150,7 +150,7 @@ async def attach_file(connection, ref, params):
     if policy is None:
         raise RuntimeStoreError('permission_denied')
     # The staging helpers are bound onto the sidecar module's globals (method_ctx.bind_module).
-    from tui_gateway import server
+    from hermes_runtime import server
     session = {'cwd': policy.cwd, 'profile_home': authority.profile_id}
     try:
         stored, uploaded = await asyncio.to_thread(
@@ -329,7 +329,7 @@ def _session_servers(authority, sid, ready):
     a platform allowlist enabled, and one the policy names but that parked serves the chat nothing."""
     import json
     from gateway.session_policy import restore_policy
-    from hermes_cli.tools_config import enabled_mcp_server_names
+    from hermes_cli.tool_selection import enabled_mcp_server_names
     from hermes_state_local import local_receipt
     policy = restore_policy(local_receipt(authority.db, sid)['policy'])
     return sorted(set(policy.toolsets) & enabled_mcp_server_names(json.loads(policy.config_json)) & set(ready))
@@ -422,7 +422,7 @@ def control_snapshot(authority, ref):
     from hermes_cli.heartbeat import HeartbeatState
     # These pure serializers don't bind/import the legacy server. In particular
     # do not reuse _snapshot_control: its manager loader can write on a read.
-    from tui_gateway.methods_session_control import (
+    from hermes_runtime.methods_session_control import (
         _safe_goal_snapshot, _safe_loop_snapshot, _safe_heartbeat_snapshot,
         _snapshot_revision, _snapshot_updated_at,
     )

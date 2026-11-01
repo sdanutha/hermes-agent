@@ -35,13 +35,13 @@ import threading
 
 import pytest
 
-import tui_gateway.server as srv
+import hermes_runtime.server as srv
 
 CANON = "Bot Chat"
 
 
 # ---------------------------------------------------------------------------
-# Fixtures (style shared with tests/tui_gateway/test_profiles_list_canonical_session.py)
+# Fixtures (style shared with tests/hermes_runtime/test_profiles_list_canonical_session.py)
 # ---------------------------------------------------------------------------
 
 
@@ -51,7 +51,7 @@ def home(tmp_path, monkeypatch):
 
     ``session.list`` reaches the DB through the gateway's shared launch
     handle (``srv._get_db``), which is bound at process launch — so, like
-    tests/tui_gateway/test_session_hidden_rpc.py, we point it at the temp
+    tests/hermes_runtime/test_session_hidden_rpc.py, we point it at the temp
     DB directly. ``profiles.list`` reads each profile dir's state.db itself
     and only needs the env override.
     """

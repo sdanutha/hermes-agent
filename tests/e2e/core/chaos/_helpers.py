@@ -1,7 +1,7 @@
 """Shared oracle helpers for the chaos (agent-turn liveness) E2E lane.
 
 The chaos suites drive a REAL Hermes surface (AIAgent child process, GatewayRunner,
-tui_gateway JSON-RPC subprocess) against ``tests/fakes/fake_llm_provider`` in a fault
+hermes_runtime JSON-RPC subprocess) against ``tests/fakes/fake_llm_provider`` in a fault
 mode and then check the same liveness invariants everywhere:
 
 * bounded termination — the turn ends (answer or surfaced error) within the

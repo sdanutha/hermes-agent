@@ -120,7 +120,7 @@ def _held_prefill(authority):
 
 
 def _read_prefill(authority, policy):
-    from hermes_cli.cli_config_load import _load_prefill_messages, _resolve_prefill_messages_file
+    from hermes_cli.runtime_prefill import _load_prefill_messages, _resolve_prefill_messages_file
     home = Path(str(authority.profile_id))
     if not home.is_absolute():
         from hermes_constants import get_hermes_home

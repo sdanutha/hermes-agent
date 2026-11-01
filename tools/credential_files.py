@@ -257,7 +257,7 @@ _CACHE_DIRS: list[tuple[str, str]] = [
     # Unswept generated image/video deliverables (#126445) need their own mount/sync
     # entry or remote backends never see them. No legacy alias exists.
     (_GENERATED_CACHE, _GENERATED_CACHE),
-    # Flat top-level desktop staging dirs (tui_gateway attach RPCs; no legacy alias),
+    # Flat top-level desktop staging dirs (hermes_runtime attach RPCs; no legacy alias),
     # mounted so vision/file tools in sandboxes reach uploads and dropped files.
     # Mount it so vision can reach uploads inside sandbox containers (#69575). No legacy alias exists, so
     # both tuple slots are ``images``.

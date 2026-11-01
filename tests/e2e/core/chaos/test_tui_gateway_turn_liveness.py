@@ -1,6 +1,6 @@
-"""C8 chaos: agent-turn liveness through the REAL tui_gateway JSON-RPC subprocess.
+"""C8 chaos: agent-turn liveness through the REAL hermes_runtime JSON-RPC subprocess.
 
-``python -m tui_gateway.entry`` is the exact process the Ink TUI and Desktop drive over
+``python -m hermes_runtime.entry`` is the exact process the Ink TUI and Desktop drive over
 stdio. Only the LLM provider is faked (``tests/fakes/fake_llm_provider``); the agent,
 tools, SessionDB and the RPC dispatcher are the shipped code. Each scenario starts its
 own gateway (so process hygiene is judged per fault), opens a session, submits a turn
@@ -457,6 +457,6 @@ def scenario_futures(request: pytest.FixtureRequest, tmp_path_factory: pytest.Te
 
 
 @pytest.mark.parametrize("scn", [pytest.param(s, id=s.id) for s in SCENARIOS])
-def test_tui_gateway_turn_stays_live_under_fault(scn: Scenario, scenario_futures) -> None:
+def test_hermes_runtime_turn_stays_live_under_fault(scn: Scenario, scenario_futures) -> None:
     stats = scenario_futures[scn.id].result(timeout=WARMUP_DEADLINE_S + 3 * TURN_DEADLINE_S + 120)
     print(json.dumps(stats))

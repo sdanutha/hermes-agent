@@ -153,7 +153,7 @@ def register_from_config(cfg: Optional[dict[str, Any]], *, accept_hooks: bool = 
 
     ``interactive=True`` lets a hook that is not yet allowlisted ask at the terminal; only a
     foreground CLI command passes it. Every other caller (gateway startup and profile loads, cron
-    and managed workers, tui_gateway, force-reload re-registration) never prompts: ``isatty()``
+    and managed workers, hermes_runtime, force-reload re-registration) never prompts: ``isatty()``
     cannot tell a hidden console or ``NUL`` from a person, and a prompt there blocks the event loop
     until the liveness watchdog kills the gateway (#120356, #127822)."""
     specs, _complete = _hook_specs(cfg)

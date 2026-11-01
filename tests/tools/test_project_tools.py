@@ -138,7 +138,7 @@ def test_session_switch_to_pathless_project_sets_profile_active_pointer(monkeypa
 def gui_sessions(monkeypatch):
     """Live GUI sessions wired through the real gateway workspace callback."""
     monkeypatch.setattr("hermes_cli.banner.prefetch_update_check", lambda: None)
-    from tui_gateway import server
+    from hermes_runtime import server
 
     monkeypatch.setattr(server, "_sessions", {})
     monkeypatch.setattr(terminal_tool, "_task_env_overrides", {})

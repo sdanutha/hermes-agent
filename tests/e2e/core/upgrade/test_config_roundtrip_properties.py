@@ -7,7 +7,7 @@ A seeded property / matrix layer over every surface that writes ``config.yaml`` 
       explicit-default values, dotted provider names and nulls all survive);
 * P2  "set one key" changes exactly one key, on every writer: in-process ``set_config_value`` over
       EVERY documented scalar leaf of ``DEFAULT_CONFIG``, the real ``hermes config set`` CLI
-      subprocess, a real ``python -m tui_gateway.entry`` stdio JSON-RPC process (``config.set``),
+      subprocess, a real ``python -m hermes_runtime.entry`` stdio JSON-RPC process (``config.set``),
       and the dashboard/Desktop ``PUT /api/config`` (partial bodies, like Desktop sends);
 * P3  a failed read never results in a clobbering write: for every single config read an
       operation performs, a transient ``EMFILE`` on exactly that read, plus unreadable, truncated
@@ -341,7 +341,7 @@ def _reset_config_caches(*, keep_lkg: bool = False) -> None:
     if not keep_lkg:
         C._LAST_EXPANDED_CONFIG_BY_PATH.clear()
     with contextlib.suppress(Exception):
-        from tui_gateway import server
+        from hermes_runtime import server
         server._cfg_cache = server._cfg_sig = server._cfg_path = None
 
 
@@ -365,7 +365,7 @@ def home(monkeypatch):
     assert str(_cfg_path()).startswith(str(hh))
     _reset_config_caches()
     with contextlib.suppress(Exception):
-        from tui_gateway import server
+        from hermes_runtime import server
         monkeypatch.setattr(server, "_hermes_home", hh)
     yield hh
     _reset_config_caches()
@@ -389,7 +389,7 @@ def _quiet():
 class ReadFaults:
     """Counts every read of config.yaml through the lowest-level YAML read seam
     (``hermes_cli.config.fast_safe_load`` — every config.yaml reader in hermes_cli.config,
-    ``read_user_config_raw`` and therefore tui_gateway go through it) and fails chosen reads with
+    ``read_user_config_raw`` and therefore hermes_runtime go through it) and fails chosen reads with
     a transient ``EMFILE`` on an otherwise intact file."""
 
     def __init__(self, monkeypatch, config_path: Path):
@@ -648,7 +648,7 @@ def test_p2_env_lock_refusal_is_not_reported_as_success(key, tmp_path):
         assert _read(hh / "config.yaml") == cfg_text, "a refused env write still rewrote config.yaml"
 
 
-# ── real tui_gateway stdio JSON-RPC process ──────────────────────────────────
+# ── real hermes_runtime stdio JSON-RPC process ──────────────────────────────────
 
 class _RpcProc:
     def __init__(self, root: Path):
@@ -656,8 +656,8 @@ class _RpcProc:
         self.env = isolated_env(root, pythonpath=WORKTREE)
         self.home = Path(self.env["HERMES_HOME"])
         _write_file(self.home / "config.yaml", "model_catalog:\n  enabled: false\n")
-        self.stderr = open(root / "tui_gateway.stderr", "w", encoding="utf-8")
-        self.proc = subprocess.Popen([sys.executable, "-m", "tui_gateway.entry"], cwd=str(WORKTREE), env=self.env,
+        self.stderr = open(root / "hermes_runtime.stderr", "w", encoding="utf-8")
+        self.proc = subprocess.Popen([sys.executable, "-m", "hermes_runtime.entry"], cwd=str(WORKTREE), env=self.env,
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.stderr,
                                      text=True, encoding="utf-8", bufsize=1)
         self.q: queue.Queue = queue.Queue()
@@ -675,10 +675,10 @@ class _RpcProc:
         try:
             msg = self.q.get(timeout=max(0.05, deadline - time.monotonic()))
         except queue.Empty:
-            raise AssertionError(f"tui_gateway timed out; stderr:\n{(self.root / 'tui_gateway.stderr').read_text()[-3000:]}")
+            raise AssertionError(f"hermes_runtime timed out; stderr:\n{(self.root / 'hermes_runtime.stderr').read_text()[-3000:]}")
         if msg is None:
-            raise AssertionError(f"tui_gateway exited rc={self.proc.poll()}; stderr:\n"
-                                 f"{(self.root / 'tui_gateway.stderr').read_text()[-3000:]}")
+            raise AssertionError(f"hermes_runtime exited rc={self.proc.poll()}; stderr:\n"
+                                 f"{(self.root / 'hermes_runtime.stderr').read_text()[-3000:]}")
         return msg
 
     def wait_event(self, etype: str, timeout: float) -> dict:
@@ -712,7 +712,7 @@ class _RpcProc:
 
 @pytest.fixture(scope="module")
 def rpc(tmp_path_factory):
-    p = _RpcProc(tmp_path_factory.mktemp("c18_tui_gateway"))
+    p = _RpcProc(tmp_path_factory.mktemp("c18_hermes_runtime"))
     yield p
     p.close()
 
@@ -734,7 +734,7 @@ _RPC_CASES = [
 
 
 @pytest.mark.parametrize("key,values,path,xf", _RPC_CASES, ids=[c[0] for c in _RPC_CASES])
-def test_p2_real_tui_gateway_config_set_changes_exactly_one_key(key, values, path, xf, rpc):
+def test_p2_real_hermes_runtime_config_set_changes_exactly_one_key(key, values, path, xf, rpc):
     seed = 500 + _RPC_CASES.index(next(c for c in _RPC_CASES if c[0] == key))
     case = gen_case(seed, exclude_top={"model_catalog"})
     text = _before_version(case.text, "model_catalog:\n  enabled: false\n")
@@ -843,7 +843,7 @@ def _op_save(ctx: dict) -> None:
 
 
 def _op_tui(ctx: dict) -> None:
-    from tui_gateway import server
+    from hermes_runtime import server
     resp = server._methods["config.set"](1, {"key": "skin", "value": ctx["new"]})
     if "error" in resp:
         raise RuntimeError(resp["error"])
@@ -1205,7 +1205,7 @@ def test_p6_null_section_survives_every_surface(section, web_app, home, monkeypa
     resolvers, save, CLI set, TUI RPC and Desktop PUT (the #105674 `display: null` class)."""
     from gateway.display_config import resolve_display_setting, resolve_tool_progress
     from hermes_cli.config_effective import load_user_config_effective
-    from tui_gateway import server
+    from hermes_runtime import server
 
     text, tree, cfg, null_line = _p6_setup(section, monkeypatch)
     ctx = f"{section}: null"

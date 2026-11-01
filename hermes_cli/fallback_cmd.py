@@ -140,7 +140,7 @@ def cmd_fallback_list(args) -> None:
 
 def cmd_fallback_add(args) -> None:
     """Launch the same picker as `hermes model`, then append the selection to the chain."""
-    from hermes_cli.main import _require_tty, select_provider_and_model
+    from hermes_cli.runtime_support import _require_tty, select_provider_and_model
     from hermes_cli.config import load_config, save_config
     _require_tty("fallback add")
 

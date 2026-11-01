@@ -7,7 +7,7 @@ inherit this fd can cause the gateway to exit with stdin EOF during tool
 execution (issue #14036, PR #39257).
 
 This script checks that all subprocess.run() and subprocess.Popen() calls
-in TUI-context files (agent/, tools/, plugins/, tui_gateway/,
+in TUI-context files (agent/, tools/, plugins/, hermes_runtime/,
 optional-skills/) explicitly set stdin= to prevent fd inheritance.
 
 Exit codes:
@@ -34,7 +34,7 @@ TUI_CONTEXT_DIRS = [
     "agent/",
     "tools/",
     "plugins/",
-    "tui_gateway/",
+    "hermes_runtime/",
     # Optional-skill scripts can run inside the backend process (a command
     # builder calling a skill helper on a backend thread); their children would
     # inherit the JSON-RPC stdin too.

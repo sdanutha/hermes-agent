@@ -16,7 +16,7 @@ import pytest
 
 # Mirrors the post-pull purge of a pre-hand-off updater (v2026.9.14
 # hermes_cli/update_cmd_maint.py): package prefixes only, root-level modules survive.
-_PRE_HANDOFF_PURGE_PREFIXES = ("hermes_cli", "gateway", "tools", "tui_gateway", "agent")
+_PRE_HANDOFF_PURGE_PREFIXES = ("hermes_cli", "gateway", "tools", "hermes_runtime", "agent")
 _PRE_HANDOFF_PURGE_PROTECTED = {"hermes_cli", "hermes_cli.main", "hermes_cli.hermes_logging"}
 
 

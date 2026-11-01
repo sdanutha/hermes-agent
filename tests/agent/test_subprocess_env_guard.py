@@ -24,7 +24,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Directories that make up the shipped source tree.
-SCAN_DIRS = ("agent", "hermes_cli", "tools", "gateway", "cron", "tui_gateway", "plugins")
+SCAN_DIRS = ("agent", "hermes_cli", "tools", "gateway", "cron", "hermes_runtime", "plugins")
 SCAN_ROOT_FILES = ("cli.py", "hermes_constants.py")
 
 # How many lines around an `os.environ.copy()` we look for a spawn call.
@@ -58,7 +58,7 @@ ALLOWED_RAW_SPAWN_ENV_FILES = {
     "hermes_cli/profiles.py",
     # The compute host runs agent turns for the dashboard: Home Assistant tools, Modal/Daytona
     # backends and platform sends read keys that exist only in the process env (#65895).
-    "tui_gateway/host_supervisor.py",
+    "hermes_runtime/host_supervisor.py",
     # apt/dnf/pacman run as root, through sudo (which resets the environment) or because Hermes
     # already is root. A root child can read every process's environment anyway, and the scrub
     # helpers would point TMPDIR into HERMES_HOME's scratch dir, leaving root-owned files there.

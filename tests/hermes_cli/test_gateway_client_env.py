@@ -134,7 +134,7 @@ def test_tui_bootstrap_keeps_the_client_env_out_of_a_daemon_it_starts(monkeypatc
     import os
     from hermes_cli import gateway_runtime
     path = Path(__file__).resolve().parents[2] / 'ui-tui' / 'scripts' / 'gateway_bootstrap.py'
-    spec = importlib.util.spec_from_file_location('tui_gateway_bootstrap_probe', path)
+    spec = importlib.util.spec_from_file_location('hermes_runtime_bootstrap_probe', path)
     bootstrap = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(bootstrap)
     monkeypatch.setenv('HERMES_TUI_CLIENT_ENV', json.dumps({'PATH': '/client/bin', 'HERMES_INFERENCE_PROVIDER': 'x'}))

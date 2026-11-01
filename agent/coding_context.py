@@ -282,7 +282,7 @@ def _enabled_mcp_servers(config: Optional[dict[str, Any]]) -> list[str]:
     resolver, so plugin-provided servers stay too; *config* None reads the user's config."""
     try:
         from hermes_cli.config import read_raw_config
-        from hermes_cli.tools_config import enabled_mcp_server_names
+        from hermes_cli.tool_selection import enabled_mcp_server_names
         return sorted(enabled_mcp_server_names(read_raw_config() if config is None else config))
     except Exception:
         logger.debug("Could not list enabled MCP servers for the coding posture", exc_info=True)

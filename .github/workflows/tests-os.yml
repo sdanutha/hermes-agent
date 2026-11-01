@@ -228,7 +228,7 @@ jobs:
 
   e2e-windows:
     # Real Hermes processes on a real Windows host (tests/e2e/core/windows): hermes.exe,
-    # `hermes serve`, `hermes gateway run/stop`, the tui_gateway stdio process, cron script
+    # `hermes serve`, `hermes gateway run/stop`, the hermes_runtime stdio process, cron script
     # jobs, the terminal tool's Git Bash / PowerShell / cmd children and a ConPTY console,
     # all against the loopback fake provider (tests/fakes/fake_llm_provider.py). Separate
     # from os-tests above: those are unit-level Windows tests, these spawn process

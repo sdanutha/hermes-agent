@@ -162,7 +162,7 @@ class PtySession:
         """Whether ``pid`` runs inside this PTY: the leader itself or one of its descendants.
 
         The dashboard's PTY leader is ``node entry.js``; the process that takes the
-        session lease is its ``tui_gateway`` child, so the lease pid is never the
+        session lease is its ``hermes_runtime`` child, so the lease pid is never the
         bridge's own pid and only ancestry identifies the terminal. A bridge that
         cannot report a pid (already reaped, or a stub) is simply not a match.
         """

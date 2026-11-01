@@ -124,7 +124,7 @@ def check_legacy_desktop_checkout() -> None:
     from hermes_cli.steward import STEWARD_DESKTOP, sealed_steward
 
     try:
-        from hermes_cli.main import PROJECT_ROOT
+        from hermes_cli.runtime_support import PROJECT_ROOT
     except Exception:
         return
 

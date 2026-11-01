@@ -21,7 +21,7 @@ def cron_read(tokens):
 async def run_cron(authority, arg) -> dict:
     """``/cron <arg>`` off the owner loop in the owning profile: the store is written here, never by a client."""
     from gateway.session_info_reads import owner_lines
-    from hermes_cli.cli_cron_lines import cron_command_lines
+    from hermes_cli.runtime_cron import cron_command_lines
     # A /cron run waits for its job, and the job's admission and execution take threads from the loop's
     # default pool (tracked_write, session_cron.execute). The wait therefore holds a thread of the runner's
     # unbounded turn pool, never one of the pool the job needs, however many runs (or Ctrl+C'd waits) pile up.

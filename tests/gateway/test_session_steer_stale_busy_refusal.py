@@ -7,7 +7,7 @@ every client turns an error into "the send failed": the Desktop composer discard
 optimistic row and drops the text, so the message is unrecoverable.
 
 'Rejected' is the reply both ends already define for "not corrected — queue it as the next
-prompt" (``SessionRedirectResponse`` in the Desktop, and tui_gateway's idle-steer answer), so
+prompt" (``SessionRedirectResponse`` in the Desktop, and hermes_runtime's idle-steer answer), so
 the text survives as the next turn. Only that reply carries ``delivered: False``: a live agent's
 refusal can follow delivery (a Codex steer whose ACK timed out), so clients must not re-send it.
 """

@@ -1,7 +1,7 @@
 """Behavior tests for hermes_cli.inventory.
 
 Locks the invariants the three migrated consumers (web_server.py
-/api/model/options, tui_gateway model.options, tui_gateway model.save_key)
+/api/model/options, hermes_runtime model.options, hermes_runtime model.save_key)
 depend on:
 
 - load_picker_context() reproduces the inline 17-LOC config-slice exactly.

@@ -4,7 +4,7 @@ Two operator/agent-facing name lookups must stay inside the thing they name:
 
 * ``/memory`` and ``/skills`` ``approve|reject|diff <id>`` (#119997): the id names a record staged under
   ``<HERMES_HOME>/pending/<subsystem>/``. A ``../`` or absolute id must not read, delete or apply any
-  file outside that directory. Driven through the real ``tui_gateway`` stdio backend (``slash.exec``),
+  file outside that directory. Driven through the real ``hermes_runtime`` stdio backend (``slash.exec``),
   after real staged writes: the fake model calls the ``memory`` and ``skill_manage`` tools with
   ``memory.write_approval`` / ``skills.write_approval`` on, so the store directories exist exactly as
   they do for a user.

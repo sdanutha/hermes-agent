@@ -2618,7 +2618,7 @@ def _worker_profile_scope(hermes_home: str, *, bind_home: bool = True):
     from agent.secret_scope import build_profile_secret_scope, reset_secret_scope, set_secret_scope
     from hermes_constants import get_process_hermes_home, reset_hermes_home_override, set_hermes_home_override
     from tools.terminal_scope import install_profile_terminal_scope, reset_terminal_scope
-    from tui_gateway.launch_profile_policy import launch_secret_scope, launch_terminal_env
+    from hermes_runtime.launch_profile_policy import launch_secret_scope, launch_terminal_env
 
     home = Path(hermes_home)
     is_launch_home = str(home.resolve()) == str(Path(get_process_hermes_home()).resolve())
@@ -2653,7 +2653,7 @@ def _resolve_worker_cli_toolsets(hermes_home: Optional[str]) -> Optional[list[st
         return None
     try:
         from hermes_cli.config import load_config
-        from hermes_cli.tools_config import _get_platform_tools
+        from hermes_cli.tool_selection import _get_platform_tools
 
         with _worker_profile_scope(hermes_home):
             cfg = load_config()

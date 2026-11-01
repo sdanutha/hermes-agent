@@ -103,7 +103,10 @@ def confirmation_title(refusal):
 def confirm_choice(raw, choices):
     """``once`` / ``cancel`` (or None) for a typed answer: the choice's number or the classic
     CLI's confirm aliases (y/yes/once, n/no/cancel)."""
-    from hermes_cli.cli_modal_mixin import _CONFIRM_ALIASES
+    _CONFIRM_ALIASES = {
+    "1": "once", "once": "once", "approve": "once", "yes": "once", "y": "once", "ok": "once",
+    "2": "always", "always": "always", "remember": "always",
+    "3": "cancel", "cancel": "cancel", "nevermind": "cancel", "no": "cancel", "n": "cancel"}
     answer = (raw or '').strip().lower()
     if answer.isdigit() and 0 < int(answer) <= len(choices):
         return choices[int(answer) - 1][0]

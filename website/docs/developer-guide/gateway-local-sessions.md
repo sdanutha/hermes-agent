@@ -6,7 +6,7 @@ description: Local CLI/TUI sessions as canonical gateway admissions
 # Gateway-owned fresh local sessions
 
 The composed gateway listener can create fresh local **CLI, TUI, or GUI-policy** sessions without
-starting `tui_gateway`'s separate agent runtime. The existing `GatewayRunner` / `TurnRunner`
+starting `hermes_runtime`'s separate agent runtime. The existing `GatewayRunner` / `TurnRunner`
 own execution, approval waiters, tool calls, session storage, and canonical event delivery.
 
 A server-authenticated identity with `session:create` can call:

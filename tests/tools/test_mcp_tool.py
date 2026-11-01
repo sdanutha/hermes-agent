@@ -72,7 +72,7 @@ class TestFilterMCPChildren:
             101: [
                 "/usr/bin/python3",
                 "-m",
-                "tui_gateway.slash_worker",
+                "hermes_runtime.slash_worker",
                 "--session-key",
                 "abc",
             ],

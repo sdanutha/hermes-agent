@@ -196,7 +196,7 @@ _RECOVERABLE_END_REASONS_SQL = ", ".join(f"'{reason}'" for reason in _RECOVERABL
 # conversation boundary: "some runtime went away", so a writer that can prove liveness (e.g. a compression
 # rotation holding the lease) may clear it.  Recoverable set plus the TUI gateway's automatic reasons.
 # Superset of the recoverable set: those are already resumable accidents; the extra TUI reasons are the same
-# accident class but were historically only known to tui_gateway's _AUTOMATIC_SESSION_END_REASONS. See
+# accident class but were historically only known to hermes_runtime's _AUTOMATIC_SESSION_END_REASONS. See
 # #88197.
 _AUTOMATIC_END_REASONS = frozenset(_RECOVERABLE_END_REASONS) | {
     "tui_shutdown", "ws_disconnect", "idle_timeout", "lru_evict"}
@@ -684,7 +684,7 @@ CREATE TABLE IF NOT EXISTS conversation_generations (
     PRIMARY KEY (source, session_key)
 );
 
--- Per-backend liveness heartbeat (#94895). Each serve / tui_gateway process
+-- Per-backend liveness heartbeat (#94895). Each serve / hermes_runtime process
 -- registers a row at startup and refreshes ``last_heartbeat`` periodically.
 -- The startup orphan sweep (sessions.startup_orphan_reap) consults this
 -- table to avoid reaping rows whose owning backend is still alive but

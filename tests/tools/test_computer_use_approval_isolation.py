@@ -4,7 +4,7 @@ Two contracts:
 
 * With nobody able to answer (no interactive CLI, no gateway, yolo off) a destructive action is REFUSED and
   never reaches the backend; under yolo it runs. Historically the tool default-allowed whenever no CLI callback
-  was wired, which made every headless host (cron, api_server, tui_gateway, gateway turns) run desktop input
+  was wired, which made every headless host (cron, api_server, hermes_runtime, gateway turns) run desktop input
   ungated.
 * A grant answered through computer_use lives in ``tools.approval``'s store under computer_use's own scope key,
   so ``is_approved`` sees it and ``clear_session`` retires it like any terminal pattern.

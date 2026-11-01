@@ -602,7 +602,7 @@ class PidBridge(FakeBridge):
 @pytest.fixture
 def process_tree(monkeypatch):
     """Fake ancestry: ``{pid: {ancestor pids}}``. The dashboard PTY leader (node) is pid 4242;
-    the tui_gateway child that actually holds the session lease is 4243 underneath it."""
+    the hermes_runtime child that actually holds the session lease is 4243 underneath it."""
     import hermes_cli.pty_session as mod
 
     tree = {4243: {4242, 1}, 5152: {5151, 1}}

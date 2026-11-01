@@ -71,7 +71,7 @@ def _restored(cli, connection, result, file_path):
     restored = {"hash": result.get("restored_to", ""), "reason": result.get("reason", "")}
     print(f"  {_t('rollback.restored_file', file=file_path, **restored)}" if file_path
           else f"  {_t('rollback.restored_all', **restored)}")
-    from hermes_cli.cli_commands_session_tools import _rollback_kept
+    from hermes_cli.runtime_text import _rollback_kept
     _rollback_kept(result)  # the in-process CLI's own lines
     print(f"  {_t('rollback.snapshot_saved')}")
     if result.get("history_removed"):

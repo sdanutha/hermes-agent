@@ -456,12 +456,7 @@ def _load_config() -> dict:
                 return cfg
         except Exception:
             pass
-    try:
-        from cli import CLI_CONFIG
-        cfg = CLI_CONFIG.get("delegation") or {}
-        return cfg if isinstance(cfg, dict) else {}
-    except Exception:
-        return {}
+    return {}
 
 # OpenRouter routing filters: inherited from the parent, but reset to these defaults under a pinned provider — parent
 # filters (e.g. only=["Anthropic"]) would silently force the child back onto the parent's provider.

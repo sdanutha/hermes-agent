@@ -88,7 +88,7 @@ def test_repeated_setup_routes_records_once(hermes_home, mode, component, config
         assert hermes_logging.setup_logging(hermes_home=hermes_home, mode=mode, log_level=explicit) == hermes_home / "logs"
     hermes_logging.set_session_context("routing-session")
     sources = ["tools.terminal_tool", "agent.context_compressor", "gateway.run",
-               "plugins.platforms.telegram.adapter", "hermes_cli.web_server", "tui_gateway.ws"]
+               "plugins.platforms.telegram.adapter", "hermes_cli.web_server", "hermes_runtime.ws"]
     for index, source in enumerate(sources):
         for level in (logging.DEBUG, logging.INFO, logging.WARNING):
             logging.getLogger(source).log(level, "routing-witness-%s-%s", index, level)

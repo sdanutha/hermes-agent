@@ -128,7 +128,7 @@ the skill curator (`skills/AGENTS.md`). Cron sessions pass `skip_memory=True` by
 providers intentionally do not run during cron.
 
 - End-of-session memory extraction and provider `on_session_end` run wherever the session ends —
-  turn, eviction, shutdown, `tui_gateway` teardown — and the CALLER binds the owning profile's scope
+  turn, eviction, shutdown, `hermes_runtime` teardown — and the CALLER binds the owning profile's scope
   first (`_run_release_in_profile_scope`, `_session_profile_runtime_scope`); the agent never derives
   its home from `os.environ` at flush time (`Path(_session_db.db_path).parent` is the ground truth).
   Provider background work starts through `memory_provider.py::spawn_context_thread` (copies the

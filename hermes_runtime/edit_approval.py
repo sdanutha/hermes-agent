@@ -1,0 +1,201 @@
+"""Pre-execution edit approval policy shared by runtime tools and session controls.
+
+Intentionally isolated from the generic tool registry: ACP binds an edit
+approval requester in a ContextVar for the duration of one ACP agent run; CLI,
+gateway, and other sessions leave it unset and therefore bypass this guard.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+import re
+import tempfile
+from contextvars import ContextVar, Token
+from dataclasses import dataclass
+from itertools import count
+from pathlib import Path
+from typing import Any, Callable
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class EditProposal:
+    """A proposed single-file edit that can be shown to an ACP client."""
+
+    tool_name: str
+    path: str
+    old_text: str | None
+    new_text: str
+    arguments: dict[str, Any]
+    # Every file the edit will actually touch. ``path`` may be a comma-joined
+    # display string for multi-file V4A patches; ``paths`` is the authoritative
+    # set for auto-approve checks. Empty means "``path`` alone".
+    paths: tuple[str, ...] = ()
+
+
+EditApprovalRequester = Callable[[EditProposal], bool]
+
+_EDIT_APPROVAL_REQUESTER: ContextVar[EditApprovalRequester | None] = ContextVar("ACP_EDIT_APPROVAL_REQUESTER", default=None)
+_PERMISSION_REQUEST_IDS = count(1)
+
+SENSITIVE_AUTO_APPROVE_NAMES = {".env", ".env.local", ".env.production", "id_rsa", "id_ed25519"}
+AUTO_APPROVE_ASK = "ask"
+AUTO_APPROVE_WORKSPACE = "workspace_session"
+AUTO_APPROVE_SESSION = "session"
+
+_V4A_FILE_RE = re.compile(r'^\*\*\*\s+(?:Update|Add|Delete)\s+File:\s*(.+)$', re.MULTILINE)
+_V4A_MOVE_RE = re.compile(r'^\*\*\*\s+Move\s+File:\s*(.+?)\s*->\s*(.+)$', re.MULTILINE)
+
+
+def set_edit_approval_requester(requester: EditApprovalRequester | None) -> Token:
+    """Bind an ACP edit approval requester for the current context."""
+    return _EDIT_APPROVAL_REQUESTER.set(requester)
+
+
+def reset_edit_approval_requester(token: Token) -> None:
+    """Restore a previous edit approval requester binding."""
+    _EDIT_APPROVAL_REQUESTER.reset(token)
+
+
+def _read_text_if_exists(path: str) -> str | None:
+    p = Path(path).expanduser()
+    if p.is_file():
+        return p.read_text(encoding="utf-8-sig", errors="replace")
+    if p.exists():
+        raise OSError(f"Cannot edit non-file path: {path}")
+    return None
+
+
+def _required_path(arguments: dict[str, Any]) -> str:
+    path = str(arguments.get("path") or "")
+    if not path:
+        raise ValueError("path required")
+    from tools.file_tools_paths import _resolve_path_for_task
+    return str(_resolve_path_for_task(path))
+
+
+def _proposal_for_write_file(arguments: dict[str, Any]) -> EditProposal:
+    path = _required_path(arguments)
+    content = arguments.get("content")
+    if content is None:
+        raise ValueError("content required")
+    return EditProposal("write_file", path, _read_text_if_exists(path), str(content), dict(arguments))
+
+
+def _proposal_for_patch_replace(arguments: dict[str, Any]) -> EditProposal:
+    path = _required_path(arguments)
+    old_string, new_string = arguments.get("old_string"), arguments.get("new_string")
+    if old_string is None or new_string is None:
+        raise ValueError("old_string and new_string required")
+    old_text = _read_text_if_exists(path)
+    if old_text is None:
+        raise ValueError(f"Failed to read file: {path}")
+
+    from tools.fuzzy_match import fuzzy_find_and_replace
+
+    new_text, match_count, _strategy, error = fuzzy_find_and_replace(
+        old_text, str(old_string), str(new_string), bool(arguments.get("replace_all", False)))
+    if error or match_count == 0:
+        raise ValueError(error or f"Could not find match for old_string in {path}")
+    return EditProposal("patch", path, old_text, new_text, dict(arguments))
+
+
+def _extract_v4a_patch_paths(patch_body: str) -> list[str]:
+    paths = [m.group(1).strip() for m in _V4A_FILE_RE.finditer(patch_body)]
+    for match in _V4A_MOVE_RE.finditer(patch_body):
+        paths.extend(match.group(i).strip() for i in (1, 2))
+    return [p for p in paths if p]
+
+
+def _proposal_for_patch_v4a(arguments: dict[str, Any]) -> EditProposal:
+    patch_body = arguments.get("patch")
+    if not isinstance(patch_body, str) or not patch_body:
+        raise ValueError("patch content required")
+    paths = [_required_path({'path': path}) for path in _extract_v4a_patch_paths(patch_body)]
+    if not paths:
+        raise ValueError("no file paths found in V4A patch")
+    single = len(paths) == 1
+    # ACP only supports a single diff payload: surface the exact V4A patch as new_text so
+    # patch-mode calls are permissioned and denied patches cannot mutate.
+    return EditProposal(
+        "patch", paths[0] if single else ", ".join(paths),
+        _read_text_if_exists(paths[0]) if single else None, patch_body, dict(arguments),
+        tuple(paths),
+    )
+
+
+# (tool_name, patch mode or None) -> proposal builder.
+_PROPOSAL_BUILDERS = {
+    ("write_file", None): _proposal_for_write_file, ("patch", "replace"): _proposal_for_patch_replace,
+    ("patch", "patch"): _proposal_for_patch_v4a,
+}
+
+
+def build_edit_proposal(tool_name: str, arguments: dict[str, Any]) -> EditProposal | None:
+    """Return an edit proposal for supported file mutation calls."""
+    mode = arguments.get("mode", "replace") if tool_name == "patch" else None
+    builder = _PROPOSAL_BUILDERS.get((tool_name, mode))
+    return builder(arguments) if builder else None
+
+
+def _is_sensitive_auto_approve_path(path: str) -> bool:
+    lowered = {part.lower() for part in Path(path).expanduser().parts}
+    return bool(lowered & {".git", ".ssh"}) or Path(path).name.lower() in SENSITIVE_AUTO_APPROVE_NAMES
+
+
+def should_auto_approve_edit(proposal: EditProposal, policy: str, cwd: str | None = None) -> bool:
+    """Return whether an ACP edit proposal may bypass the prompt for this session.
+
+    Session-scoped and conservative: sensitive paths still ask under autonomous policies."""
+    policy = str(policy or AUTO_APPROVE_ASK).strip()
+    # Multi-file V4A proposals join paths into one display string; the checks
+    # must run per real target or a sensitive/escaped file hides in the join.
+    paths = proposal.paths or (proposal.path,)
+    if policy == AUTO_APPROVE_ASK or any(_is_sensitive_auto_approve_path(p) for p in paths):
+        return False
+    resolved = [Path(p).expanduser().resolve(strict=False) for p in paths]
+    if policy == AUTO_APPROVE_SESSION:
+        return True
+    if policy == AUTO_APPROVE_WORKSPACE:
+        # tempfile.gettempdir() is the real temp root on every platform
+        # (``/private/tmp`` on macOS since resolve() follows the symlink).
+        tmp = Path(tempfile.gettempdir()).resolve(strict=False)
+        ws = Path(cwd).expanduser().resolve(strict=False) if cwd else None
+        return all(
+            path.is_relative_to(tmp) or (ws is not None and path.is_relative_to(ws))
+            for path in resolved)
+    return False
+
+
+def _denied(message: str) -> str:
+    return json.dumps({"error": message}, ensure_ascii=False)
+
+
+def maybe_require_edit_approval(tool_name: str, arguments: dict[str, Any]) -> str | None:
+    """Run ACP edit approval if bound.
+
+    Returns a JSON tool-error string when the edit must be blocked, otherwise
+    ``None`` so dispatch can continue.  Requester exceptions deny by default."""
+    requester = _EDIT_APPROVAL_REQUESTER.get()
+    if requester is None:
+        return None
+    try:
+        proposal = build_edit_proposal(tool_name, arguments)
+    except Exception as exc:
+        logger.warning("Could not build ACP edit approval proposal for %s: %s", tool_name, exc)
+        return _denied(f"Edit approval denied: could not prepare diff ({exc})")
+    if proposal is None:
+        return None
+    try:
+        approved = bool(requester(proposal))
+    except Exception as exc:
+        logger.warning("ACP edit approval requester failed: %s", exc)
+        approved = False
+    return None if approved else _denied("Edit approval denied by ACP client; file was not modified.")
+
+
+
+

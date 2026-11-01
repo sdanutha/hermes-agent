@@ -21,7 +21,7 @@ def main():
     Path(os.environ['HERMES_HOME'], 'config.yaml').write_text(
         f'model:\n  default: local-wire-stub\n  provider: custom\n  base_url: {url}\n'
         'auxiliary:\n  title_generation:\n    enabled: false\n')
-    from tui_gateway.transport import StdioTransport
+    from hermes_runtime.transport import StdioTransport
 
     slow_read, slow_write = os.pipe()
     healthy_read, healthy_write = os.pipe()

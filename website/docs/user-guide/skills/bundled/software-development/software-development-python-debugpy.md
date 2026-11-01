@@ -47,7 +47,7 @@ Three tools, picked by situation:
 
 - A test fails and the traceback doesn't reveal why a value is wrong
 - You need to step through a function and watch a collection mutate
-- A long-running process (hermes gateway, tui_gateway) misbehaves and you can't restart it
+- A long-running process (hermes gateway, hermes_runtime) misbehaves and you can't restart it
 - Post-mortem: an exception fired in prod-ish code and you want to inspect locals at the crash site
 - A subprocess / child (Python `_SlashWorker`, PTY bridge worker) is the actual bug site
 
@@ -158,7 +158,7 @@ sys.excepthook = excepthook
 
 ## Recipe 5: Remote debug with debugpy (attach to running process)
 
-For long-lived processes: Hermes gateway, tui_gateway, a daemon, a process that's already misbehaving and can't be restarted clean.
+For long-lived processes: Hermes gateway, hermes_runtime, a daemon, a process that's already misbehaving and can't be restarted clean.
 
 ### Setup
 
@@ -314,12 +314,12 @@ See Recipe 3. The wrapper captures subprocess output, so run pytest directly for
 In the prepared debug checkout, add `breakpoint()` near the suspect line, then
 run `python hermes`. Control returns to your terminal at the pause point.
 
-### `tui_gateway` subprocess (spawned by `hermes --tui`)
+### `hermes_runtime` subprocess (spawned by `hermes --tui`)
 The gateway runs as a child of the Node TUI. Options:
 
 **A. Source-edit the gateway:**
 ```python
-# tui_gateway/server.py near the top of serve()
+# hermes_runtime/server.py near the top of serve()
 import debugpy
 debugpy.listen(("127.0.0.1", 5678))
 debugpy.wait_for_client()

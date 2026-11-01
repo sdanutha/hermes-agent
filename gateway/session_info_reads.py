@@ -11,12 +11,12 @@ import asyncio
 
 
 def _toolsets(authority, policy):
-    from hermes_cli.cli_info_lines import toolsets_lines
+    from hermes_cli.runtime_info import toolsets_lines
     return toolsets_lines(list(policy.current_toolsets(policy.config(authority, secrets=False))) if policy else [])
 
 
 def _platforms(authority, policy):
-    from hermes_cli.cli_info_lines import platforms_lines
+    from hermes_cli.runtime_info import platforms_lines
     return platforms_lines()
 
 

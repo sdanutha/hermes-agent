@@ -115,9 +115,6 @@ def _tool(
     return _exec
 
 
-def _callback_tool(module: str, func: str, callback_attr: str, *arg_specs: _ArgSpec) -> InlineToolExecutor:
-    """Executor for a GUI-callback tool: mapped args plus ``callback=getattr(agent, callback_attr, None)``."""
-    return _tool(module, func, *arg_specs, callback=lambda agent, ctx: getattr(agent, callback_attr, None))
 
 
 def _session_search(agent, args: dict, ctx: InlineToolContext) -> Any:
@@ -162,143 +159,33 @@ def _memory(agent, args: dict, ctx: InlineToolContext) -> Any:
     return result
 
 
-_read_preview = _callback_tool(
-    "tools.read_preview_tool", "read_preview_tool", "read_preview_callback",
-    ("start", "start"), ("count", "count"),
-)
 
 
-def _desktop_preview(agent, args: dict, ctx: InlineToolContext) -> Any:
-    # action=read needs the GUI callback (agent-level); open/close go through the
-    # registry handler like any other tool.
-    if (args.get("action") or "").strip() == "read":
-        return _read_preview(agent, args, ctx)
-    from tools.preview_tool import _handle_preview
-
-    return _handle_preview(args)
 
 
-def _manage_connections(agent, args: dict, ctx: InlineToolContext) -> Any:
-    # The GUI callback lives on the agent; registry dispatch never forwards it.
-    from tools.connectors import manage_connections
-    from tools.connectors.gateway import config as gateway_config
-
-    result = manage_connections(
-        args, session_id=getattr(agent, "session_id", None), tool_call_id=ctx.tool_call_id,
-        turn_id=getattr(agent, "_current_turn_id", None) or None,
-        connection_callback=getattr(agent, "connection_callback", None),
-        connectors_available=gateway_config.connectors_available,
-        card_surface=getattr(agent, "platform", None) == "desktop",
-    )
-    _scope_in_connected_mcp_servers(agent, result)
-    return result
 
 
-def _scope_in_connected_mcp_servers(agent, result: Any) -> None:
-    """Add the MCP servers this call connected to the agent's toolset selection.
-
-    ``tool_describe``/``tool_call`` resolve names inside that selection, and it was fixed when the
-    agent was built, so a server registered a moment ago is otherwise "not found" for the rest of
-    the turn the result calls it available in. Only the selection changes; ``agent.tools`` does
-    not, so the sent tool schema bytes stay the same."""
-    enabled = getattr(agent, "enabled_toolsets", None)
-    if enabled is None or "no_mcp" in enabled:  # None already means every toolset
-        return
-    try:
-        targets = json.loads(result).get("targets") or []
-    except (AttributeError, TypeError, ValueError):
-        return
-    connected = [str(t.get("name")) for t in targets if isinstance(t, dict)
-                 and t.get("kind") == "mcp" and t.get("state") == "connected" and t.get("tools")]
-    added = [name for name in connected if name not in enabled]
-    if added:
-        agent.enabled_toolsets = [*enabled, *added]
 
 
-def _manage_catalog(agent, args: dict, ctx: InlineToolContext) -> Any:
-    # The card callback lives on the agent; only a desktop chat draws catalog rows.
-    from tools.connectors.catalog_tool import manage_catalog
-
-    return manage_catalog(
-        args, session_id=getattr(agent, "session_id", None), tool_call_id=ctx.tool_call_id,
-        connection_callback=getattr(agent, "connection_callback", None),
-        card_surface=getattr(agent, "platform", None) == "desktop",
-    )
 
 
-def _setup_beat(agent, args: dict, ctx: InlineToolContext) -> Any:
-    # The run record lives on the session row and the card callback on the agent. A card the user wrote
-    # past ends the turn as a new message does: setup_beat runs inline (never parallel), so its result is
-    # kept and the loop stops before the next model call.
-    from agent.interrupt_control import _REASON_NEW_MESSAGE
-    from tools.setup_beat_tool import setup_beat_tool
-
-    return setup_beat_tool(
-        args, db=getattr(agent, "_session_db", None), session_id=getattr(agent, "session_id", None) or "",
-        tool_call_id=ctx.tool_call_id or "", callback=getattr(agent, "setup_beat_callback", None),
-        end_turn=lambda: agent.interrupt(tool_reason=_REASON_NEW_MESSAGE),
-    )
 
 
-def _setup_mcp_shim(agent, args: dict, ctx: InlineToolContext) -> Any:
-    # Replay shim for conversations whose cached prompt still names setup_mcp.
-    # Not in _LEGACY_TOOL_ALIASES: inline tools bypass handle_function_call.
-    return _manage_connections(agent, {
-        "action": args.get("action", "install"),
-        "connectors": [{"name": args.get("server", ""), "mcp": True}],
-    }, ctx)
 
 
 # Order is the historical if/elif order of ``execute_tool_calls_sequential``.
 _RAW_INLINE_TOOL_EXECUTORS: dict[str, InlineToolExecutor] = {
-    "todo_list": _tool(
+    'todo_list': _tool(
         "tools.todo_tool", "todo_tool", ("todos", "todos"), ("merge", "merge", False),
         store=lambda agent, ctx: agent._todo_store,
     ),
-    # Bot Mode teammate DM is injected, not registered: only a canonical Bot
-    # Chat session carries the schema, and the tool re-gates on the title.
-    "message_agent": _tool(
-        "tools.bot_mode_dm", "message_agent_tool", ("target", "target", ""), ("message", "message", ""),
-        task_id=lambda agent, ctx: ctx.effective_task_id, agent=lambda agent, ctx: agent,
-    ),
-    "session_search": _session_search,
-    "memory": _memory,
-    "clarify": _tool(
+    'session_search': _session_search,
+    'memory': _memory,
+    'clarify': _tool(
         "tools.clarify_tool", "clarify_tool", ("questions", "questions"),
         callback=lambda agent, ctx: agent.clarify_callback,
     ),
-    "read_terminal": _callback_tool(
-        "tools.read_terminal_tool", "read_terminal_tool", "read_terminal_callback",
-        ("start_line", "start_line"), ("count", "count"),
-    ),
-    "desktop_preview": _desktop_preview,
-    "drive_preview": _callback_tool(
-        "tools.drive_preview_tool", "drive_preview_tool", "drive_preview_callback",
-        ("action", "action", ""), ("ref", "ref"), ("selector", "selector"), ("text", "text"),
-        ("key", "key"), ("submit", "submit"), ("amount", "amount"), ("to", "to"), ("limit", "max"),
-    ),
-    "annotate_preview": _callback_tool(
-        "tools.annotate_preview_tool", "annotate_preview_tool", "drive_preview_callback",
-        ("action", "action", "add"), ("ref", "ref"), ("selector", "selector"), ("label", "label"),
-    ),
-    "read_window_below": _callback_tool(
-        "tools.read_window_tool", "read_window_below_tool", "read_window_below_callback",
-    ),
-    "gui_tour": _callback_tool(
-        "tools.tour_tool", "tour_tool", "tour_callback",
-        ("action", "action", ""), ("surface", "surface"), ("selector", "selector"), ("title", "title"),
-        ("text", "text"), ("side", "side"), ("steps", "steps"), ("step_index", "step_index"),
-        ("preset", "preset"),
-    ),
-    "set_theme": _callback_tool(
-        "tools.set_theme_tool", "set_theme_tool", "theme_callback",
-        ("accent", "accent"), ("mode", "mode"), ("layout", "layout"), ("picker", "picker"),
-    ),
-    "setup_beat": _setup_beat,
-    "manage_connections": _manage_connections,
-    "manage_catalog": _manage_catalog,
-    "setup_mcp": _setup_mcp_shim,
-    "delegate_task": lambda agent, args, ctx: agent._dispatch_delegate_task(args),
+    'delegate_task': lambda agent, args, ctx: agent._dispatch_delegate_task(args),
 }
 
 

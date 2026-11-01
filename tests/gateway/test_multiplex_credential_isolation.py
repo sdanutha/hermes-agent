@@ -59,7 +59,7 @@ class TestProfilePathResolutionUnderMultiplexScope:
 
     The multiplexed gateway (gateway.multiplex_profiles) serves every profile
     from ONE process, scoping each inbound turn with _profile_runtime_scope —
-    the same in-process-many-profiles topology as the desktop tui_gateway. The
+    the same in-process-many-profiles topology as the desktop hermes_runtime. The
     profile-isolation fixes (per-call path resolution + thread context
     propagation) must therefore hold under THIS scope too, not just desktop.
     This is the regression guard proving reachability is not desktop-only.

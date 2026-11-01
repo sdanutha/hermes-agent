@@ -2294,7 +2294,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
         from gateway.run import (
             _checkpoint_agent_kwargs, _current_max_iterations, _resolve_runtime_agent_kwargs,
             _resolve_gateway_model, _load_gateway_config, GatewayRunner)
-        from hermes_cli.tools_config import _get_platform_tools
+        from hermes_cli.tool_selection import _get_platform_tools
         # RuntimeError is caught ONLY here (sole provider-auth raiser); the typed subclass keeps
         # run_conversation() errors distinct.
         try:
@@ -2893,7 +2893,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
         plus the concrete tool names it expands to."""
         try:
             from hermes_cli.config import load_config
-            from hermes_cli.tools_config import (
+            from hermes_cli.tool_selection import (
                 _get_effective_configurable_toolsets, _get_platform_tools, _toolset_has_keys,
                 get_nous_subscription_features)
             from toolsets import resolve_toolset
@@ -3045,7 +3045,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
                 # Recoverable-archive resurrection (#92687): a canonical Bot Chat archived by the ws-orphan
                 # reaper / older agent cleanup is invisible to list_sessions_rich (include_archived=False),
                 # which would fail `hermes peer dm` resolution and mint transient sessions — same accident
-                # the tui_gateway lookups heal.
+                # the hermes_runtime lookups heal.
                 from tools.bot_mode_probe import BOT_CHAT_TITLE
 
                 def _resurrect() -> bool:
@@ -3452,7 +3452,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
         second writer beside the lease holder: the open chat never shows the message or the reply,
         its live context never learns of them, and the two transcripts interleave in state.db.
         Local and relayed DMs already hand such a message to the owner's mailbox
-        (``tools/bot_mode_dm.py``, ``tui_gateway/methods_bot_relay.py``). This waits for the owner's
+        (``tools/bot_mode_dm.py``, ``hermes_runtime/methods_bot_relay.py``). This waits for the owner's
         receipt on the same budget as the local path, so the peer still gets the reply on this call.
         """
         admitted = await self._admit_to_live_bot_chat(ctx["session_id"], ctx["user_message"], ctx["run_kwargs"].get("turn_author"))
@@ -3553,7 +3553,7 @@ class APIServerAdapter(OpenAICompatRoutesMixin, BasePlatformAdapter):
         history = await self._conversation_history_for_session(session_id)
         result, usage = await self._run_agent(conversation_history=history, **ctx["run_kwargs"])
         # One policy-gated re-run of a transiently failed turn — the peer-DM transport's half of the
-        # retry the local (``tools.bot_mode_dm``) and relayed (``tui_gateway.methods_bot_relay``)
+        # retry the local (``tools.bot_mode_dm``) and relayed (``hermes_runtime.methods_bot_relay``)
         # delivery lanes already apply (#93091 item 5, #115325). Same policy, same gate: transient
         # classes (429 / 5xx) re-run the SAME session once, a context overflow lets the re-run's
         # pre-API compaction shrink the transcript first, and auth/quota/config/model never re-run. The

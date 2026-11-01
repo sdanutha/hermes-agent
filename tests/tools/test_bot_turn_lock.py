@@ -178,4 +178,4 @@ def test_peer_stdin_delivery_skips_local_lock(root, tmp_path, monkeypatch):
         t.join(timeout=5)
 
 
-# ── wiring: relay deliver RPC (tui_gateway/methods_bot_relay.py) ─────────────
+# ── wiring: relay deliver RPC (hermes_runtime/methods_bot_relay.py) ─────────────

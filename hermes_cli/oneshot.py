@@ -485,7 +485,7 @@ def _apply_stored_session_runtime(
     re-fetches credentials for the restored provider."""
     if explicit_model:
         return choice
-    from hermes_cli.cli_model_switch_mixin import stored_session_route
+    from hermes_cli.session_route import stored_session_route
 
     route = stored_session_route(session_meta, current_model=choice.model, current_provider=choice.provider)
     if route is None:
@@ -516,7 +516,7 @@ def _run_agent(
     ``--usage-file`` is requested) attaches this run's auxiliary usage to the result."""
     from hermes_cli.config import load_config
     from hermes_cli.runtime_provider import resolve_runtime_with_fallback
-    from hermes_cli.tools_config import _get_platform_tools
+    from hermes_cli.tool_selection import _get_platform_tools
     from run_agent import AIAgent
 
     cfg = load_config()

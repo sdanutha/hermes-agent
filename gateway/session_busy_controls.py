@@ -202,7 +202,7 @@ async def correct(connection, ref, params, *, verb):
         # A claim can outlive the agent that carried it (a reaped turn the client still believes is
         # running), and a redirect in the build window has no agent to queue behind. Nothing live can
         # take the text, so answer 'rejected' — the wire contract's "not corrected, queue it as the
-        # next prompt" (desktop SessionRedirectResponse, tui_gateway's idle-steer reply). Raising here
+        # next prompt" (desktop SessionRedirectResponse, hermes_runtime's idle-steer reply). Raising here
         # made clients discard the message (#141644). ``delivered: False`` is the confirmation a
         # client may re-admit on: the live-agent 'rejected' below can follow delivery.
         if agent is None:

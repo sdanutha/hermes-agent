@@ -494,6 +494,8 @@ class GatewayChatView:
         _write_usage_file(self.usage_file, result, failure=failure)
 
     async def run(self, query=None, *, oneshot=False):
+        if not oneshot or not query:
+            raise GatewayClientError("Headless chat requires a query")
         self.quiet = self.quiet or oneshot
         self.finite = oneshot
         self.show_pending()
@@ -556,38 +558,6 @@ class GatewayChatView:
                 # advanced it past the row printed at start).
                 self._print_exit_ids()
                 return exit_code
-            from prompt_toolkit import PromptSession
-            from prompt_toolkit.patch_stdout import patch_stdout
-            from hermes_cli.skin_engine import get_active_prompt_symbol, get_active_skin
-            welcome = "Welcome to Hermes Agent! Type your message or /help for commands."
-            print(get_active_skin().get_branding("welcome", welcome), flush=True)
-            # The classic status bar's leading segments: model, then the attached session.
-            prompt = PromptSession(erase_when_done=True,
-                                   bottom_toolbar=lambda: f" \u2624 {self.model} \u2502 {self.session_id} ")
-            prompt_symbol = get_active_prompt_symbol("❯ ")
-            self._composer = prompt if sys.stdin.isatty() else None
-            with patch_stdout():
-                while not self.failure:
-                    try:
-                        # Empty when the stream failed first: the loop guard then raises it.
-                        text = (await self._read_line(prompt, prompt_symbol)).strip()
-                        if not text:
-                            continue
-                        if text.startswith("/"):
-                            if not await self.command(text):
-                                return 0
-                        else:
-                            # Same scrollback shape as the in-process CLI: the typed prompt line is
-                            # erased on submit and the message lands as a `●` preview row.
-                            print(f"\n{'─' * 40}\n● {text}", flush=True)
-                            await self.submit(text)
-                    except KeyboardInterrupt:
-                        print("Use /stop to interrupt execution, /quit to detach.")
-                    except EOFError:
-                        return 0
-                    except GatewayClientError as exc:
-                        print(f"Error: {exc}", file=sys.stderr)
-                raise self.failure
         finally:
             renderer.cancel()
             with suppress(asyncio.CancelledError):

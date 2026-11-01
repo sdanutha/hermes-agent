@@ -1,5 +1,5 @@
 """Plugin-side helpers for the MCP + plugin suite: portable (Agent Plugins v1) packages on disk,
-and a ``tui_gateway`` stdio host (the Ink TUI's backend) driven over JSON-RPC in an ``E2EHome``."""
+and a ``hermes_runtime`` stdio host (the Ink TUI's backend) driven over JSON-RPC in an ``E2EHome``."""
 
 from __future__ import annotations
 
@@ -73,8 +73,8 @@ class TuiHost:
 
 @contextlib.contextmanager
 def tui_host(eh: E2EHome, env: dict[str, str] | None = None) -> Iterator[TuiHost]:
-    """``python -m tui_gateway.entry`` exactly as the Ink TUI spawns it, in the fake home."""
-    proc = subprocess.Popen([sys.executable, "-m", "tui_gateway.entry"], cwd=eh.project, env=eh.env(env),
+    """``python -m hermes_runtime.entry`` exactly as the Ink TUI spawns it, in the fake home."""
+    proc = subprocess.Popen([sys.executable, "-m", "hermes_runtime.entry"], cwd=eh.project, env=eh.env(env),
                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             text=True, bufsize=1)
     cap = StreamCapture().start(proc)

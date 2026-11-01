@@ -109,7 +109,7 @@ _PRELOAD = (
 # its purge in the pre-pull interpreter: the restart phase (``hermes_cli.gateway`` and what
 # it pulls), the maintenance/summary steps, and the atexit browser cleanup that re-imports
 # ``tools.browser_tool`` -> ``hermes_cli.config`` (#112522). Entry points that only ever start
-# in a NEW process (gateway.run, tui_gateway.entry, cron.scheduler) are covered by the
+# in a NEW process (gateway.run, hermes_runtime.entry, cron.scheduler) are covered by the
 # fresh-interpreter smoke instead.
 _POST_PURGE_IMPORTS = (
     "hermes_cli.config", "hermes_cli.managed_scope", "hermes_cli.gateway", "gateway.status",
@@ -492,7 +492,7 @@ def test_every_shipped_module_imports_from_a_clean_first_party_graph(tmp_path):
     ids = [e["id"] for e in entries]
     # Non-vacuous: the list really is the packaging config (every root module, every package).
     assert len(ids) == len(set(ids)), "duplicate module ids in the enumeration"
-    assert {"hermes_cli.main", "run_agent", "gateway.run", "tui_gateway.entry", "acp_adapter.entry"} <= set(ids)
+    assert {"hermes_cli.main", "run_agent", "gateway.run", "hermes_runtime.entry", "acp_adapter.entry"} <= set(ids)
     find_tops = {p.split(".")[0] for p in PYPROJECT["tool"]["setuptools"]["packages"]["find"]["include"]}
     covered_tops = {i.split(".")[0] if not i.endswith(".py") else i.split("/")[0] for i in ids}
     assert find_tops <= covered_tops, f"packages.find tops with no module enumerated: {find_tops - covered_tops}"

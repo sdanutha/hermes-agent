@@ -1,74 +1,12 @@
-# hermes_cli/ + cli.py — CLI, slash commands, config, skins, updater, profiles
+# Headless management CLI
 
-Applies on top of the root `AGENTS.md`. Long-form: `website/docs/developer-guide/cli-internals.md`.
+Applies with the root guide. `main.py` handles profile and environment bootstrap; `core_commands.py` composes management commands. `hermes_core.py` launches the owner and health check. No REPL, TUI, dashboard or desktop entry point is supported.
 
-## CLI architecture
+Finite `chat -q` submissions use the canonical gateway authority; never create an independent execution owner in the CLI. Keep reusable file, config, provider and text helpers in `runtime_*.py`, and import their defining modules directly. Do not restore imports of removed `cli.py` or UI mixins.
 
-`cli.py` holds `HermesCLI` (REPL loop, config, slash dispatch); behaviour lives in mixins
-`hermes_cli/cli_commands_mixin.py`, `cli_stream_mixin.py`, `cli_status_bar_mixin.py`,
-`cli_billing_mixin.py`, `cli_tui_mixin.py` (widgets, keybindings, panels), `cli_tui_runtime_mixin.py`
-(run-loop phases: input dispatch, startup, signals, shutdown), `cli_init_mixin.py` (the `__init__`
-phases), ... Module-level helpers live in topical siblings that `cli.py` re-exports:
-`cli_config_load.py` (defaults + YAML merge, env mirroring), `cli_render.py` (ANSI/skin colours,
-light mode, markdown, `_cprint`, panel wrap), `cli_terminal_input.py` (file drops, paste/Enter-key
-sequences, CPR guards), `cli_shutdown.py` (exit watchdog, cleanup steps, one-shot finalize),
-`cli_single_query.py` (`-q` runner, exit codes, kanban loops), `cli_auto_maintenance.py` (state-db/checkpoint maintenance).
-Moved bodies late-bind cli-level names via `from cli import ...` at call time, so patch seams on the
-`cli` facade still intercept them; mutable module state (`_cleanup_done`, `_OUTPUT_HISTORY`,
-`_LIGHT_MODE_CACHE`, ...) and every `global`-writing function stay in `cli.py`. **Rich** renders banner/panels; **prompt_toolkit**
-handles input + autocomplete; `KawaiiSpinner` (`agent/display.py`) animates API calls and prints
-the `┊` activity feed. `load_cli_config()` in `cli.py` merges CLI defaults + user YAML.
+`gateway.py` remains the process/service-management facade. Preserve its process identity checks and profile ownership. Never infer process identity from an argv substring.
 
-`hermes_cli/gateway.py` is the `hermes gateway` facade (process discovery, PM-aware systemd unit
-generation/refresh, command dispatch); topical siblings re-exported by the facade include
-`gateway_launchd.py` (macOS LaunchAgent backend), `gateway_setup_wizard.py`
-(`hermes gateway setup`: `_PLATFORMS` registry, status table, per-platform prompts, service offer),
-`gateway_windows*.py`, `gateway_supervised_restart.py`, `gateway_migrate*.py`, `gateway_multiplex_*.py`,
-`gateway_enroll.py`, `gateway_command_errors.py`. Sibling bodies read facade names through `_gw()`
-(late binding on `hermes_cli.gateway`), so monkeypatch on the facade; mutable state such as
-`_resolved_launchd_domain` stays a facade global.
-`process_command()` resolves the canonical name via `resolve_command()` then dispatches through
-`HermesCLI._SLASH_DISPATCH` (`canonical -> (method name, pass_arg)`), falling back to a
-`_handle_<name>_command` method by naming convention. **There is no `elif` ladder — do not add one.**
-Skill slash commands (`agent/skill_commands.py`) scan `~/.hermes/skills/` and inject as a **user
-message**, never into the system prompt (prompt caching).
-
-Rules: all interactive menu-pickers use curses (`hermes_cli/curses_ui.py`; example
-`hermes_cli/tools_config.py`). Never emit `\033[K` (ANSI erase-to-EOL) in spinner/display code —
-it leaks as literal `?[K` under prompt_toolkit's `patch_stdout`; space-pad instead:
-`f"\r{line}{' ' * pad}"`. Wrapper CLIs extend via the protected hooks in `cli_tui_mixin.py`
-(`website/docs/developer-guide/extending-the-cli.md`), not by overriding `run()`.
-
-## Slash command registry (`hermes_cli/commands.py`)
-
-`COMMAND_REGISTRY` (list of `CommandDef`) is the single source; everything derives from it: CLI
-dispatch (`resolve_command()`), gateway `GATEWAY_KNOWN_COMMANDS` + dispatch, `gateway_help_lines()`,
-`telegram_bot_commands()` (BotCommand menu), `slack_subcommand_map()`, `COMMANDS` (autocomplete),
-`COMMANDS_BY_CATEGORY` (`show_help()`). Fields: `name` (no slash), `description`, `category`
-(`Session | Configuration | Tools & Skills | Info | Exit`), `aliases` tuple, `args_hint`,
-`cli_only`, `gateway_only`, `gateway_config_gate` (config dotpath; a `cli_only` command becomes
-gateway-available when truthy — `GATEWAY_KNOWN_COMMANDS` always includes gated commands so the
-gateway can dispatch them; help/menus show them only when the gate is open).
-
-**Adding a command:** (1) `CommandDef("mycommand", "What it does", "Session", aliases=("mc",),
-args_hint="[arg]")` in `COMMAND_REGISTRY`; (2) `_handle_mycommand_command(self, cmd_original)` on the
-relevant `cli_*_mixin.py` (picked up by convention) or an explicit `_SLASH_DISPATCH` entry
-`"mycommand": ("_handle_mycommand", True)` when the method name/arg-passing differs; (3) for the
-gateway, `_handle_mycommand_command(self, event)` on the matching `gateway/slash_commands_*.py`
-mixin and list it in `_IDLE_COMMANDS` (or `_PLAIN_COMMANDS` if it must work mid-run) in
-`gateway/run_busy.py` — handlers resolve by name via `_command_handler_table`; (4) persistent
-settings via `save_config_value()` in `cli.py`. **Adding an alias** = add to `aliases`; every
-surface updates automatically. Commands that mutate system-prompt state default to deferred
-invalidation with `--now` opt-in (root invariant).
-
-### Shared goal commands
-
-`hermes_cli/goal_command.py::dispatch_goal_command` owns `/goal` parsing and manager
-mutations. CLI, messaging gateway, TUI/Desktop/dashboard and Desktop goal controls
-all delegate there; adapters only resolve sessions, authorize gate creation, render
-results, and schedule kickoff/continuation prompts. Async callers preserve ContextVars
-when running dispatch off-loop (drafting uses profile-scoped auxiliary credentials).
-Do not add a surface-specific goal parser. ACP has no goal command or goal loop yet.
+Skills enter the normal user message path. Changes to prompt-affecting config, skills or tools apply to new sessions; preserve per-conversation prompt caching. Plugins extend the existing registry and loader.
 
 ## Config system (`hermes_cli/config.py`)
 
@@ -96,7 +34,7 @@ set/get/unset <NAME>` route any bare name registered in `OPTIONAL_ENV_VARS` / `_
   `atomic_yaml_write` / `yaml.dump` / `yaml.safe_dump` on a config path — `scripts/check_config_yaml_writers.py`
   (CI lint) rejects it, and `tests/hermes_cli/test_config_yaml_comment_preservation.py` guards each
   path (#92554). The commented example blocks are appended only when the file is created.
-- **Three loaders — know which you're in:** `load_cli_config()` (CLI, `cli.py`); `load_config()`
+- **Three loaders — know which you're in:** `load_config()` (headless CLI); `load_config()`
   (`hermes tools/setup`, most subcommands, `hermes_cli/config.py`, merges `DEFAULT_CONFIG`);
   `hermes_cli/config_effective.py::load_user_config_effective()` (gateway runtime via
   `gateway/run.py::_load_gateway_config`, TUI gateway `_load_cfg`, cron, `hermes send`, doctor,
@@ -112,36 +50,6 @@ set/get/unset <NAME>` route any bare name registered in `OPTIONAL_ENV_VARS` / `_
   the consuming surface uses. Under multiplex the process env never overrides a profile's YAML.
 - **Working directory:** CLI uses `os.getcwd()`; messaging uses `terminal.cwd`, bridged to
   `TERMINAL_CWD` for child tools.
-
-## Skin engine (`hermes_cli/skin_engine.py`)
-
-Skins are **pure data** (`SkinConfig`); no code change to add one. `init_skin_from_config()` reads
-`display.skin` at startup; `get_active_skin()` (cached), `set_active_skin(name)` (`/skin`),
-`load_skin(name)` (user `~/.hermes/skins/*.yaml` → built-ins → default; missing values inherit
-from `default`). Built-ins in `_BUILTIN_SKINS`: `default`, `ares`, `mono`, `slate`. Keys: `colors.*`
-(banner border/title/accent/dim/text, response_border), `spinner.*` (waiting/thinking faces,
-thinking_verbs, wings), `tool_prefix`, `tool_emojis`, `branding.*` (agent_name, welcome,
-response_label, prompt_symbol). Consumers: `banner.py`, `display.py`, `cli.py`. Key-by-key table
-and YAML template: `website/docs/user-guide/features/skins.md`.
-
-## Update pipeline (`hermes update`)
-
-Transactional, `plan → snapshot → apply → restart-per-kind → verify → report`; every stage guards a
-real field failure (fleet campaign #91277), and a PR that weakens a stage answers for that class.
-The stage-by-stage contract: `website/docs/developer-guide/cli-internals.md` § Update pipeline.
-
-- Snapshots cover EVERY profile with one identical file set (never partial or tiered); they are
-  file-loss recovery, `--backup` owns rollback.
-- The Windows ZIP fallback fires only when git itself failed, refuses a dirty tree, and grafts the
-  `_ZIP_PRESERVED_NESTED` build outputs into the swap.
-- Restarts are fleet-wide and drain-first, bounded by the home each unit runs on
-  (`update_fleet_scope.py`); another install's runtime is never restarted.
-- Post-commit failures are owed follow-ups, exit 0 (stash left 1, Ctrl-C 130);
-  receipts in ROOT `logs/update_receipts/`.
-- Nothing runs pulled code in the pre-pull interpreter. `update_handoff.py` and
-  `update_serve_obligations.py` are a FROZEN compat surface (`tests/compat/old_updater_surface.json`):
-  removing a name bricks releases mid-update.
-- Read #92091 (gateway-owned control socket) before adding any process-scan heuristic.
 
 ## Profiles (multi-instance)
 

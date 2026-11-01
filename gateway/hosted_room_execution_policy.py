@@ -95,7 +95,7 @@ def execution_policy_mapping(*, target_profile: str, config: Mapping[str, Any] |
     if not isinstance(config, Mapping):
         raise RoomExecutionPolicyError("gateway config is invalid")
     from hermes_cli.config import resolve_turn_limit
-    from hermes_cli.tools_config import _get_platform_tools
+    from hermes_cli.tool_selection import _get_platform_tools
     from tools.approval import _YOLO_MODE_FROZEN
     from tools.approval_context import _normalize_approval_mode
     toolsets = sorted({*_get_platform_tools(dict(config), "api_server"), "bot_room"})

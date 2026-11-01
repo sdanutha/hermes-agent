@@ -232,8 +232,8 @@ class GatewayConfigLoadersMixin:
 
     @classmethod
     def _load_service_tier(cls) -> str | None:
-        """``agent.service_tier`` parsed like the CLI (``hermes_cli.cli_config_load``); None when unset/unknown."""
-        from hermes_cli.cli_config_load import _parse_service_tier_config
+        """``agent.service_tier`` parsed like the CLI (``hermes_cli.runtime_prefill``); None when unset/unknown."""
+        from hermes_cli.runtime_prefill import _parse_service_tier_config
 
         return _parse_service_tier_config(cls._cfg_str("agent", "service_tier"))
 

@@ -3,7 +3,7 @@
 The first offer comes ``OFFER_DELAY_S`` after the first finished task. Each later offer needs another
 finished task after the previous offer, comes ``OFFER_DELAY_S`` after that task, and never sooner than
 ``REOFFER_AFTER_S[n]`` after the previous offer, so a user who keeps saying "Not now" hears it less
-often. "Finished task" is ``tui_gateway.free_tier_task_done``'s call. The record is install-wide, at
+often. "Finished task" is ``hermes_runtime.free_tier_task_done``'s call. The record is install-wide, at
 ``<default root>/free_tier/sign_in_offer.json``. Signing in ends the free tier, and with it every offer.
 """
 

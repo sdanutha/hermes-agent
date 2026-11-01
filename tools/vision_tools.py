@@ -1027,14 +1027,6 @@ async def _handle_vision_analyze(args: dict[str, Any], **kw: Any) -> str:
     return await vision_analyze_tool(image_url, full_prompt, model, task_id=task_id, region=region)
 
 
-registry.register(
-    name="vision_analyze",
-    toolset="vision",
-    schema=VISION_ANALYZE_SCHEMA,
-    handler=_handle_vision_analyze,
-    check_fn=check_vision_requirements,
-    is_async=True,
-    emoji="👁️")
 
 
 # --- video_analyze --------------------------------------------------------
@@ -1180,13 +1172,3 @@ def _handle_video_analyze(args: dict[str, Any], **kw: Any) -> Awaitable[str]:
         f"transitions. Then answer the following question:\n\n{question}")
     model = _configured_aux_model(("video", "vision"), ("AUXILIARY_VIDEO_MODEL", "AUXILIARY_VISION_MODEL"))
     return video_analyze_tool(video_url, full_prompt, model, task_id=kw.get("task_id"))
-
-
-registry.register(
-    name="video_analyze",
-    toolset="video",
-    schema=VIDEO_ANALYZE_SCHEMA,
-    handler=_handle_video_analyze,
-    check_fn=check_video_requirements,
-    is_async=True,
-    emoji="🎬")

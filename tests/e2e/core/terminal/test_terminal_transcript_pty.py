@@ -2,7 +2,7 @@
 exactly once, unmangled, and matches what was persisted.
 
 Real chain: a real ``hermes chat --cli`` / ``hermes --tui`` process (the TUI spawns its real Node
-frontend and real ``tui_gateway`` child) on a real PTY, a real AIAgent + SessionDB on disk, and the
+frontend and real ``hermes_runtime`` child) on a real PTY, a real AIAgent + SessionDB on disk, and the
 recording fake OpenAI-compatible provider streaming scripted multi-chunk replies, a tool-call turn
 and a reasoning turn. The byte stream is rendered through a VT emulator so assertions are made on
 the grid a user would see (plus the scrollback they could scroll to), not on repaint history.

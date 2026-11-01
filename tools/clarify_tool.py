@@ -1,6 +1,6 @@
 """Clarify tool: structured multiple-choice / open-ended questions to the user.
 Schema, validation and a thin dispatcher; the UI lives in a platform-provided
-callback (cli.py, gateway/run.py, tui_gateway)."""
+callback (cli.py, gateway/run.py, hermes_runtime)."""
 
 import json
 from typing import Callable, Dict, List, Optional
@@ -110,7 +110,7 @@ def _result(normalized: list[dict], reply: dict) -> str:
 
 def clarify_tool(questions, callback: Optional[Callable] = None) -> str:
     """Ask 1-5 questions in one call. ``callback(questions) -> {"answers", "outcome", "notice"?}``
-    is platform injected (cli.py / gateway / tui_gateway) and receives the normalized list."""
+    is platform injected (cli.py / gateway / hermes_runtime) and receives the normalized list."""
     normalized, error = _normalize_questions(questions)
     if error:
         return tool_error(error)

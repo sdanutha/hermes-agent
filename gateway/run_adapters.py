@@ -1673,7 +1673,7 @@ class GatewayAdapterLifecycleMixin:
             return contextlib.nullcontext()
         if profile_home is not None:
             return scope_factory(profile_home)
-        from tui_gateway.launch_profile_policy import launch_profile_scope_if_multiplexed
+        from hermes_runtime.launch_profile_policy import launch_profile_scope_if_multiplexed
         return launch_profile_scope_if_multiplexed()
 
     @staticmethod
@@ -1683,7 +1683,7 @@ class GatewayAdapterLifecycleMixin:
             return contextlib.nullcontext()
         if profile_home is not None:
             return scope_factory(profile_home)
-        from tui_gateway.launch_profile_policy import async_launch_profile_scope_if_multiplexed
+        from hermes_runtime.launch_profile_policy import async_launch_profile_scope_if_multiplexed
         return async_launch_profile_scope_if_multiplexed()
 
     def _canonicalize(self, source, *, transport_profile: Optional[str] = None,
@@ -1807,7 +1807,7 @@ class GatewayAdapterLifecycleMixin:
         credentials after a hosted room flipped the process-wide guard (#112878). The credential
         body is marked at entry (``launch_body``): a turn already running when a second profile
         switches this gateway to multiplexing keeps resolving its launch credentials."""
-        from tui_gateway.launch_profile_policy import launch_body
+        from hermes_runtime.launch_profile_policy import launch_body
 
         async def _handler(*args):
             with launch_body(), self._standalone_launch_scope():

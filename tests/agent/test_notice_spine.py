@@ -5,7 +5,7 @@ Covers:
      object.__new__ — same pattern as test_steer.py and test_file_mutation_verifier.py).
   B. Constructor / init_agent signature threading.
   C. TUI _agent_cbs notice binding — mirrors the status_callback tests already
-     in tests/tui_gateway/test_tui_gateway_server.py.
+     in tests/hermes_runtime/test_hermes_runtime_server.py.
 """
 from __future__ import annotations
 
@@ -50,12 +50,12 @@ def _bare_agent() -> AIAgent:
 
 
 class TestAgentCbsNoticeBinding:
-    """Mirror test_status_callback_emits_kind_and_text from test_tui_gateway_server.py."""
+    """Mirror test_status_callback_emits_kind_and_text from test_hermes_runtime_server.py."""
 
     def test_notice_callback_emits_notification_show(self):
-        from tui_gateway import server
+        from hermes_runtime import server
 
-        with patch("tui_gateway.server._emit") as mock_emit:
+        with patch("hermes_runtime.server._emit") as mock_emit:
             cbs = server._agent_cbs("sid123")
             notice = AgentNotice(
                 text="credits 90% used",
@@ -84,10 +84,10 @@ class TestAgentCbsNoticeBinding:
 
 
     def test_notice_clear_callback_event_type_is_notification_clear(self):
-        from tui_gateway import server
+        from hermes_runtime import server
 
         captured = []
-        with patch("tui_gateway.server._emit", side_effect=lambda *a: captured.append(a)):
+        with patch("hermes_runtime.server._emit", side_effect=lambda *a: captured.append(a)):
             cbs = server._agent_cbs("sid123")
             cbs["notice_clear_callback"]("some.key")
 

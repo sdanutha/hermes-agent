@@ -93,8 +93,8 @@ SITES = {
     "pet/store::_download": lambda u, mp, tmp: importlib.import_module("agent.pet.store")._download(
         u, tmp / "sheet.png", timeout=5),
     "pet/manifest::fetch_manifest": lambda u, mp, tmp: _fetch_manifest(u, mp),
-    "tui_gateway/methods_images::_image_to_data_url": lambda u, mp, tmp: importlib.import_module(
-        "tui_gateway.methods_images")._image_to_data_url(u, 1_000_000),
+    "hermes_runtime/methods_images::_image_to_data_url": lambda u, mp, tmp: importlib.import_module(
+        "hermes_runtime.methods_images")._image_to_data_url(u, 1_000_000),
     "skills_hub_skillssh::_sitemap_catalog": lambda u, mp, tmp: _sitemap_catalog(u, mp),
 }
 

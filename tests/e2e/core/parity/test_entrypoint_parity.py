@@ -71,7 +71,7 @@ Driver = Callable[..., DriveResult]
 DRIVERS: dict[str, Driver] = {
     "oneshot (-z)": _drive_cli.drive_oneshot,
     "chat -q": _drive_cli.drive_chat_q,
-    "tui_gateway (stdio)": _drive_rpc.drive_tui_gateway,
+    "hermes_runtime (stdio)": _drive_rpc.drive_hermes_runtime,
     "serve (Desktop WS)": _drive_rpc.drive_serve,
     "gateway (fake adapter)": _drive_gateway.drive_gateway,
     "api_server": _drive_gateway.drive_api_server,

@@ -1000,9 +1000,8 @@ class GatewayAgent:
             self._todo_from_result(result)
         diff = payload.get("inline_diff")
         if isinstance(diff, str) and diff:
-            from cli import _cprint
-            from hermes_cli.cli_modern_layout import diff_printer
-            emit = diff_printer(_cprint)
+            from hermes_cli.runtime_text import _cprint
+            emit = _cprint
             for line in diff.rstrip("\n").splitlines():
                 emit(line)
             if name == "delegate_task" and self.tool_complete_callback is not None:

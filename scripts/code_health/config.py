@@ -76,8 +76,8 @@ RULES: tuple[Rule, ...] = (
     Rule("E722", "bare `except:`", "catch a named exception (bare except also swallows"
          " KeyboardInterrupt/SystemExit)", "ruff"),
     # Correctness basics.
-    # tui_gateway method modules get the server's names injected (`bind_module(globals(), ...)`).
-    Rule("F821", "undefined name", "import or define it", "ruff", exclude=("tui_gateway/*",)),
+    # hermes_runtime method modules get the server's names injected (`bind_module(globals(), ...)`).
+    Rule("F821", "undefined name", "import or define it", "ruff", exclude=("hermes_runtime/*",)),
     Rule("F823", "local used before assignment", "assign before use or declare global",
          "ruff", exclude=()),
     Rule("F811", "redefinition of unused name", "remove the shadowed definition", "ruff",

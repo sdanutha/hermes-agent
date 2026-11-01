@@ -1,7 +1,7 @@
 
 """Regression test: the TUI launcher must not spend time on plugin discovery.
 
-`hermes --tui` just spawns a Node process; the spawned tui_gateway backend
+`hermes --tui` just spawns a Node process; the spawned hermes_runtime backend
 performs its own plugin discovery. Running discover_plugins() in the
 launcher added ~0.5s to every `hermes --tui` startup for work the backend
 then redoes. Plain chat must still discover plugins.
@@ -64,7 +64,7 @@ def test_plugin_discovery_skipped_for_tui_launch(monkeypatch):
     main_mod._prepare_agent_startup(_args(tui=True))
     assert calls == [], (
         "Plugin discovery must not run in the TUI launcher: the spawned "
-        "tui_gateway backend discovers plugins itself."
+        "hermes_runtime backend discovers plugins itself."
     )
 
 

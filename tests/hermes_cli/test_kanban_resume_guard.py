@@ -3,7 +3,7 @@
 Behaviour tests for the centralized guard (`hermes_cli/kanban_resume_guard.py`) and the three
 CLI resume surfaces it protects: startup `--resume` (`_preload_resumed_session`), mid-chat
 `/resume`, and the quiet one-shot resume (`oneshot._load_resume_target`). The gateway surface
-is covered in `tests/tui_gateway/test_kanban_resume_guard.py`.
+is covered in `tests/hermes_runtime/test_kanban_resume_guard.py`.
 """
 
 from io import StringIO

@@ -9,7 +9,7 @@ existing input path:
 - messaging gateway → the adapter FIFO (``_enqueue_fifo``)
 
 The TUI/Desktop ``command.dispatch`` boundary is covered in
-``tests/tui_gateway/test_goal_command.py``.
+``tests/hermes_runtime/test_goal_command.py``.
 """
 
 from __future__ import annotations

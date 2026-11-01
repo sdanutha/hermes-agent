@@ -116,7 +116,7 @@ def _caller_cwd(args) -> str:
 
 def _workspace_key(cwd):
     """The classic CLI's workspace identity for ``-c`` (git root, else the cwd)."""
-    from hermes_cli.main import _resolve_workspace_key
+    from hermes_cli.runtime_support import _resolve_workspace_key
     previous = os.getcwd()
     try:
         os.chdir(cwd)

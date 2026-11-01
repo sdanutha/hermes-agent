@@ -2,7 +2,7 @@
 
 Behavior contracts: the HTTP→exception mapping in
 ``hermes_cli.nous_billing._raise_for_error`` and the
-``tui_gateway.server._serialize_billing_error`` envelope the TUI branches on.
+``hermes_runtime.server._serialize_billing_error`` envelope the TUI branches on.
 These assert the wire contract (CF-4) — error code, actor, recovery, retry —
 not specific copy.
 """
@@ -59,11 +59,11 @@ def test_409_idempotency_conflict_passes_through():
     assert exc.error == "idempotency_conflict"
 
 
-# ── envelope serialization (tui_gateway.server) ──────────────────────
+# ── envelope serialization (hermes_runtime.server) ──────────────────────
 
 
 def _serialize(status, payload, headers=None):
-    import tui_gateway.server as srv
+    import hermes_runtime.server as srv
 
     return srv._serialize_billing_error(_raise(status, payload, headers))
 

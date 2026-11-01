@@ -217,7 +217,7 @@ including when Hermes surfaces run in separate processes. Ownership is sticky:
 the first eligible claimant keeps the listener until it stops, disconnects, or
 its process exits. Hermes does not silently fail over to another open surface.
 Set `surface` when you want to pin ownership instead of using first-claim wins.
-The TUI and desktop GUI share the same Python backend (`tui_gateway`), which
+The TUI and desktop GUI share the same Python backend (`hermes_runtime`), which
 runs the detector server-side and yields the mic to voice capture while a
 command records.
 

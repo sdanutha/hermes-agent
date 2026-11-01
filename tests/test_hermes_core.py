@@ -125,6 +125,7 @@ def test_headless_execution_cancellation_persistence_and_shutdown(tmp_path):
         'model': {'provider': 'custom', 'default': 'fixture', 'base_url': url},
         'auxiliary': {'title_generation': {'enabled': False}},
         'platform_toolsets': {'cli': ['file']}}))
+    (home / '.env').write_text('API_SERVER_KEY=core-fixture-credential-0123456789abcdef\nOPENAI_API_KEY=local-fixture-only\n')
     env = {k: os.environ[k] for k in ('PATH', 'LANG', 'TZ') if k in os.environ}
     env.update(HOME=str(user), HERMES_HOME=str(home), HERMES_RUNTIME_DIR=str(tmp_path / 'runtime'),
                PYTHONPATH=str(root), OPENAI_API_KEY='local-fixture-only', OPENAI_BASE_URL=url,
@@ -144,8 +145,19 @@ def test_headless_execution_cancellation_persistence_and_shutdown(tmp_path):
             checked = subprocess.run([sys.executable, '-m', 'hermes_core', 'health'], env=env,
                                      capture_output=True, text=True, timeout=15, check=False)
             assert checked.returncode == 0, checked.stdout + checked.stderr
-            sid = asyncio.run(exercise(home, descriptor, peer))
+            try:
+                sid = asyncio.run(exercise(home, descriptor, peer))
+            except Exception:
+                log.seek(0)
+                print(log.read())
+                raise
             exercise_http(root, env, peer, api_port)
+            chat = subprocess.run([sys.executable, '-m', 'hermes_core', 'chat', '-q', 'SAY_OK',
+                                   '--provider', 'custom', '--model', 'fixture', '--base-url', url],
+                                  env=env, cwd=root, capture_output=True, text=True, timeout=45, check=False)
+            assert chat.returncode == 0, chat.stdout + chat.stderr
+            assert 'CORE_OK' in chat.stdout
+
             proc.terminate()
             # The existing owner treats unmarked SIGTERM as an external stop (exit 1),
             # after graceful teardown, so supervisors can distinguish planned stops.

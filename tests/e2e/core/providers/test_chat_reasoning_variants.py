@@ -10,7 +10,7 @@
 * DeepSeek-style ``reasoning_content`` is echoed on the assistant tool-call message,
   within the turn and after ``--resume``.
 * A long Nous Portal session replays every earlier turn's ``reasoning_details`` verbatim
-  and keeps answering, driven through one long-lived ``tui_gateway`` backend.
+  and keeps answering, driven through one long-lived ``hermes_runtime`` backend.
 """
 
 from __future__ import annotations

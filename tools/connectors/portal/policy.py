@@ -7,7 +7,7 @@ from tools.connectors.portal.errors import InvalidConnectorSlug
 from tools.connectors.portal.wire import PolicyBody, UnrestrictedPolicyBody
 
 if TYPE_CHECKING:
-    from tui_gateway.contracts.connectors import ConnectorChange, ToolsChange
+    from hermes_runtime.contracts.connectors import ConnectorChange, ToolsChange
 
 
 class InvalidMemberPolicy(ValueError):

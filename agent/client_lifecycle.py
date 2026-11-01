@@ -103,7 +103,7 @@ def _swap_fallback_clients(agent, fb_client, fb_provider: str, fb_model: str, fb
 class ClientLifecycleMixin:
     def _close_task_resources(self, task_id: str) -> None:
         """Release task resources without treating a shared environment as process ownership."""
-        from run_agent import _quietly, cleanup_browser, cleanup_vm
+        from run_agent import _quietly, cleanup_vm
 
         def kill_processes() -> None:
             from tools.process_registry import process_registry
@@ -121,10 +121,6 @@ class ClientLifecycleMixin:
                         process["session_id"], source="agent_close", consume_output=True,
                     )
 
-        def release_computer_use() -> None:
-            from tools.computer_use.tool import release_computer_use_session
-            release_computer_use_session(task_id)
-
         def forget_file_state() -> None:
             # File tools key their read stamps / writer claims by the per-turn task_id (cron:
             # ``cron:<job>:<uuid>``, subagents: ``subagent-N-xxxx``), which differs from session_id;
@@ -134,8 +130,8 @@ class ClientLifecycleMixin:
                 if owner and owner != task_id:
                     clear_file_ops_cache(owner)
 
-        for step in (kill_processes, lambda: cleanup_vm(task_id), lambda: cleanup_browser(task_id),
-                     release_computer_use, forget_file_state):
+        for step in (kill_processes, lambda: cleanup_vm(task_id),
+                     forget_file_state):
             _quietly(step)
 
     def _client_log_context(self) -> str:

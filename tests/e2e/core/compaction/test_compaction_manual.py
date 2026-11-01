@@ -1,6 +1,6 @@
 """C4 manual compaction: ``/compress``, ``/compress here N`` and rolling micro-compaction, end to end.
 
-``/compress`` goes through the TUI/Desktop choke point (``tui_gateway`` ``_compress_session_history`` ->
+``/compress`` goes through the TUI/Desktop choke point (``hermes_runtime`` ``_compress_session_history`` ->
 ``compress_now``) on a real AIAgent + SessionDB after a seeded session; micro-compaction runs from the
 real turn finalizer. After the compaction the same invariants as the automatic suite are asserted:
 
@@ -44,7 +44,7 @@ def _tui_session(sc: Scenario) -> dict:
 
 
 def _compress_via_tui(sc: Scenario, args: str) -> int:
-    from tui_gateway.server import _compress_session_history
+    from hermes_runtime.server import _compress_session_history
 
     session = _tui_session(sc)
     sc.install()

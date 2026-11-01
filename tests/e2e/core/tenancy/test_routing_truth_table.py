@@ -14,7 +14,7 @@ OPENROUTER_BASE_URL/OPENROUTER_API_KEY and ``vendor`` = ANTHROPIC_API_KEY). Each
 own random key. A loopback CONNECT trap (HTTPS_PROXY) records any egress to a real inference API. EVERY scenario
 configures ALL identities (the full config a real user accumulates) and differs only in the
 selection, so a misroute always has somewhere to land and be caught. Hermes runs for real in a
-child process (``hermes chat -q``, ``hermes -z``, the stdio ``tui_gateway`` the TUI/Desktop
+child process (``hermes chat -q``, ``hermes -z``, the stdio ``hermes_runtime`` the TUI/Desktop
 drive) with a tmp HOME/HERMES_HOME and every credential env var stripped.
 
 One invariant (``check_routing``) after every leg: requests exist only on the selected hosts,
@@ -328,7 +328,7 @@ def test_cli_routing_truth_table(case: Case, cli_outcomes: dict[str, Any]) -> No
             f"{host} main-request keys in order: {seen}")
 
 
-# Mid-session /model switches through the real tui_gateway (TUI / Desktop backend) -------------
+# Mid-session /model switches through the real hermes_runtime (TUI / Desktop backend) -------------
 
 
 @dataclass
@@ -344,7 +344,7 @@ def _titled(gw: TuiGateway, sid: str, title: str) -> Callable[[dict[str, Any]], 
     return lambda m: is_title(m) and ((m.get("params") or {}).get("payload") or {}).get("title") == title
 
 
-def test_tui_gateway_model_switch_routing(tmp_path: Path, request: pytest.FixtureRequest) -> None:
+def test_hermes_runtime_model_switch_routing(tmp_path: Path, request: pytest.FixtureRequest) -> None:
     """One live session walks the switch matrix; after every switch the next turn lands on
     exactly the selected host with exactly its key, and nothing reaches any other host.
     Leg 5 pins the #120295 fix; leg 6 pins the #120299 fix."""

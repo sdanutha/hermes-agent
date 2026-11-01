@@ -227,7 +227,7 @@ class LocalSubagents:
         return entries
 
     def subagent_tail(self, subagent_id, *, fetch=False):
-        from hermes_cli.cli_subagent_monitor import read_tail
+        from hermes_cli.transcript_tail import read_tail
         return read_tail(self._paths.get(subagent_id))
 
     def subagent_control(self, action, subagent_id, message=None):

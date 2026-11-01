@@ -45,7 +45,7 @@ def worktree_state(info: dict) -> Optional[str]:
 
 def _still_in_use(path: str, grace_s: float = 5.0) -> bool:
     """Whether a live process (other than this one) still works in *path* after a short grace:
-    the TUI's own backend (``tui_gateway``) takes a moment to exit after the Ink UI closes."""
+    the TUI's own backend (``hermes_runtime``) takes a moment to exit after the Ink UI closes."""
     import time
 
     from hermes_cli.worktree_sweep import live_process_pids

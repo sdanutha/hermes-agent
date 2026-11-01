@@ -16,7 +16,7 @@ logger = logging.getLogger("hermes_cli.main")
 
 def _pyproject_project(debug_fmt: str | None = None) -> dict | None:
     """``[project]`` table of pyproject.toml, or ``None`` when absent/unreadable."""
-    from hermes_cli.main import PROJECT_ROOT
+    from hermes_cli.runtime_support import PROJECT_ROOT
     pyproject = PROJECT_ROOT / "pyproject.toml"
     if not pyproject.is_file():
         return None
@@ -40,12 +40,12 @@ def _pyproject_project(debug_fmt: str | None = None) -> dict | None:
 # Narrow lazy probes must NEVER clear the generic core marker.
 # See #58004.
 def _update_marker_path() -> Path:
-    from hermes_cli.main import PROJECT_ROOT
+    from hermes_cli.runtime_support import PROJECT_ROOT
     return PROJECT_ROOT / ".update-incomplete"
 
 
 def _lazy_refresh_marker_path() -> Path:
-    from hermes_cli.main import PROJECT_ROOT
+    from hermes_cli.runtime_support import PROJECT_ROOT
     return PROJECT_ROOT / ".lazy-refresh-incomplete"
 
 
@@ -92,7 +92,7 @@ def _is_windows() -> bool:
 
 def _venv_scripts_dir() -> Path | None:
     """Return the venv Scripts directory if we're running inside the project venv."""
-    from hermes_cli.main import PROJECT_ROOT
+    from hermes_cli.runtime_support import PROJECT_ROOT
     from hermes_constants import project_venv_dir
     from pm.environments import venv_bin_dir
     venv_dir = project_venv_dir(PROJECT_ROOT)
@@ -219,7 +219,7 @@ def _cleanup_quarantined_exes(scripts_dir: Path | None = None) -> None:
     scripts_dir = scripts_dir if scripts_dir is not None else _venv_scripts_dir()
     if scripts_dir is None:
         return
-    from hermes_cli.main import PROJECT_ROOT
+    from hermes_cli.runtime_support import PROJECT_ROOT
     from hermes_cli.update_lock import update_in_progress
 
     if update_in_progress(PROJECT_ROOT):

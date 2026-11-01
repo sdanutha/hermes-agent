@@ -282,7 +282,7 @@ async def test_restart_wait_cuts_sockets_opened_before_it(tmp_path, monkeypatch,
     async def fallback(*args):
         pytest.fail("a ticketed native socket must not enter the legacy fallback")
 
-    monkeypatch.setattr("tui_gateway.ws.handle_ws", handle)
+    monkeypatch.setattr("hermes_runtime.ws.handle_ws", handle)
     monkeypatch.setattr(web, "_DASHBOARD_EMBEDDED_CHAT_ENABLED", True)
     monkeypatch.setattr(web_server_chat, "_ws_request_is_allowed", lambda ws: True)
     frame = json.dumps({"method": "prompt.receipt"})

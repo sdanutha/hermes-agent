@@ -240,7 +240,7 @@ def test_library_imports_of_dual_use_entry_modules_stay_side_effect_free(tmp_pat
     code = textwrap.dedent("""
         import json, os, sys
         before = dict(os.environ)
-        import agent.auxiliary_client, gateway.relay, tui_gateway.compute_host  # noqa: F401
+        import agent.auxiliary_client, gateway.relay, hermes_runtime.compute_host  # noqa: F401
         changed = sorted(k for k in before.keys() | os.environ.keys() if before.get(k) != os.environ.get(k))
         print(json.dumps({"bootstrapped": "hermes_bootstrap" in sys.modules, "changed": changed}))
     """)
@@ -594,7 +594,7 @@ class TestHappyEyeballsSocketConnect:
     reason="environ array lifetime is a glibc property")
 class TestNeverFreeEnviron:
     """A new ``os.environ`` name must never free the ``environ`` array another thread may be
-    walking in C ``getenv`` (getaddrinfo, OpenSSL) — glibc < 2.41 did, and the tui_gateway
+    walking in C ``getenv`` (getaddrinfo, OpenSSL) — glibc < 2.41 did, and the hermes_runtime
     segfaulted when ``session.create`` added names during the picker-prewarm fetch."""
 
     def test_arrays_superseded_by_new_names_stay_intact(self):

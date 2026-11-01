@@ -120,12 +120,12 @@ _PY_RELEVANT_SITE = (
 # Editing only the JSON in an apps/-only PR would otherwise skip the one test
 # that can catch the drift, so these force the Python lane too.
 _PY_RELEVANT_CONTRACT_FILES = {
-    # tests/tui_gateway/contracts/test_generated.py (rendered from tui_gateway/contracts)
+    # tests/hermes_runtime/contracts/test_generated.py (rendered from hermes_runtime/contracts)
     "apps/shared/src/gateway-contract.generated.ts",
     "apps/shared/src/gateway-contract.openrpc.json",
     # tests/hermes_cli/test_desktop_slash_registry.py
     "apps/desktop/src/lib/desktop-slash-registry.json",
-    # tests/tui_gateway/test_show_reasoning_display_gate.py (card-tool names vs the gateway lifecycle set)
+    # tests/hermes_runtime/test_show_reasoning_display_gate.py (card-tool names vs the gateway lifecycle set)
     "apps/desktop/src/lib/tool-render-class.ts",
     # tests/website/test_catalog_rules_mirror.py (docs page mirrors the canonical rules)
     "plugin-catalog/README.md",

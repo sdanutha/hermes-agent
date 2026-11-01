@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_TREES = ("hermes_cli", "agent", "gateway", "tui_gateway", "cron", "plugins", "tools", "cli.py", "utils.py")
+DEFAULT_TREES = ("hermes_cli", "agent", "gateway", "hermes_runtime", "cron", "plugins", "tools", "cli.py", "utils.py")
 # The config writer module and the on-disk primitive it wraps.
 ALLOWED_FILES = {ROOT / "utils.py"}
 DUMPERS = {"atomic_yaml_write", "safe_dump", "dump"}

@@ -471,7 +471,7 @@ class TestIntegrationWithModelsModule:
 
 class TestSwrRefreshProfileScope:
     """Two profile homes — A (process default) and B (routed via the HERMES_HOME ContextVar, as
-    tui_gateway ``_profile_scoped`` does). The off-thread stale-while-revalidate refresh spawned
+    hermes_runtime ``_profile_scoped`` does). The off-thread stale-while-revalidate refresh spawned
     under B must write B's cache file, and A's in-flight refresh must not suppress B's."""
 
     _CFG = {"enabled": True, "url": "http://master", "ttl_hours": 1.0, "providers": {}}

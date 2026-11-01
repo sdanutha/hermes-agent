@@ -21,7 +21,7 @@ def _diff(cli, connection, cmd):
     args = cmd.partition(" ")[2].strip().lower().split()
     if "session" not in args:
         return False
-    from hermes_cli.cli_commands_session_tools import _lines, _pr, _t, print_session_diff
+    from hermes_cli.runtime_text import _lines, _pr, _t, print_session_diff
     result = connection.call("rollback.session_diff", session_id=cli.session_id) or {}
     if not result.get("enabled"):
         _pr(*_lines(_t("diff.not_enabled")))
@@ -39,7 +39,7 @@ def _reload(cli, connection, cmd):
 
 
 def _handoff(cli, connection, cmd):
-    from cli import _cprint
+    from hermes_cli.runtime_text import _cprint
     from hermes_cli.gateway_chat_commands import refusal
     _cprint(f"  {refusal('handoff')}")
     return True
@@ -62,6 +62,6 @@ def run(cli, canonical, cmd):
     try:
         return route(cli, connection, (cmd or "").strip())
     except GatewayClientError as exc:
-        from cli import _cprint
+        from hermes_cli.runtime_text import _cprint
         _cprint(f"  /{canonical}: {exc}")
         return True
