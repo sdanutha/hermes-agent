@@ -20,7 +20,7 @@ async def verify_envelope_guards(runner, source):
     authority = runner.session_authority
     ref = authority.register(source)
     before = rows(authority, ref.session_id)
-    actor = Principal('authenticated-viewer', 'default', frozenset({'session:submit'}), 'fixture')
+    actor = Principal('authenticated-viewer', runner.session_authority.profile_id, frozenset({'session:submit'}), 'fixture')
     try:
         await authority.submit(actor, Submission('forged-source', ref, {
             'text': 'FORGED', 'native_text_v1': {'source': {'internal': True}}}, 'queue'))
@@ -121,7 +121,7 @@ async def recover_probe(runner, adapter, source, peer):
     assert next(r for r in blocked if r['request_id'] == 'crash-started')['status'] == 'unknown'
     assert next(r for r in blocked if r['request_id'] == 'unknown-follower')['status'] == 'queued'
     assert authority.sessions[safe_sid].source.platform == source.platform
-    assert authority.agent(SessionRef('default', blocked_sid)) is None
+    assert authority.agent(SessionRef(authority.profile_id, blocked_sid)) is None
     already_completed = initial[0]['status'] == 'terminal'
     assert len(peer.requests) == (0 if already_completed else 1), peer.requests
     if not already_completed:

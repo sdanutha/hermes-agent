@@ -325,3 +325,11 @@ native/fts5_cjk/*.so
 /pm/.lock.json.lock
 
 apps/desktop/.dist-build*
+
+# Local Core Runtime installation and state
+.core-state/
+.core-runtime/
+.core-venv/
+!examples/
+examples/*
+!examples/core_client.py

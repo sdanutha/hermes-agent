@@ -98,11 +98,12 @@ def run(repo: Path, base: str, head: str | None, as_json: bool = False,
         return 0
     changes = gitio.changed_files(repo, base, head)
     head_paths = sorted({c.new for c in changes if c.new and in_scope(c.new)})
-    base_paths = sorted({c.old for c in changes if c.old and in_scope(c.old)})
+    base_paths = sorted({c.old for c in changes if c.old and in_scope(c.old)
+                         and (c.new or in_scope(c.old) == "py")})
     if not head_paths:
         _skipped("code health: no measured files changed", as_json)
         return 0
-    # Base files are measured too: a deleted .py still needs ruff on the base side.
+    # Preserve Python move history. Deleted frontend units need no Node toolchain to measure.
     needs_ruff = any(p.endswith(".py") for p in (*head_paths, *base_paths))
     ruff = resolve_ruff(repo) if needs_ruff else []
     measurer = Measurer(repo, ruff, known_env=gitio.known_env_names(repo, base))

@@ -126,3 +126,19 @@ plans/
 /*.png.bak
 *.tar.gz
 *.tgz
+
+# Core builds need metadata, but never developer state or UI build infrastructure.
+!README.md
+.claude/
+.codex/
+docs/
+website/
+apps/
+web/
+ui-tui/
+assets/
+tests-js/
+.env.example
+.core-state/
+.core-runtime/
+.core-venv/

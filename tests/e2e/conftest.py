@@ -125,12 +125,6 @@ _ensure_discord_mock()
 _ensure_slack_mock()
 
 import discord
-from plugins.platforms.telegram.adapter import TelegramAdapter
-from plugins.platforms.discord.adapter import DiscordAdapter
-
-import plugins.platforms.slack.adapter as _slack_mod
-_slack_mod.SLACK_AVAILABLE = True
-from plugins.platforms.slack.adapter import SlackAdapter
 
 
 # Platform-generic factories
@@ -259,6 +253,9 @@ def make_runner(platform: Platform, session_entry: SessionEntry = None) -> Gatew
 
 
 def make_adapter(platform: Platform, runner=None):
+    from plugins.platforms.telegram.adapter import TelegramAdapter
+    from plugins.platforms.discord.adapter import DiscordAdapter
+    from plugins.platforms.slack.adapter import SlackAdapter
     """Create a platform adapter wired to *runner*, with send methods mocked."""
     if runner is None:
         runner = make_runner(platform)
@@ -422,6 +419,7 @@ def get_response_text(adapter) -> str | None:
 
 
 def _make_discord_adapter_wired(runner=None):
+    from plugins.platforms.discord.adapter import DiscordAdapter
     """Create a DiscordAdapter wired to a GatewayRunner for e2e tests."""
     if runner is None:
         runner = make_runner(Platform.DISCORD)

@@ -15,6 +15,7 @@ from typing import Callable
 
 # extra name -> module that proves it is installed
 ANCHORS: dict[str, str | tuple[str, ...]] = {
+    "runtime": ("aiohttp", "mcp"),
     "anthropic": "anthropic",
     "bedrock": "boto3",
     "vertex": "google.auth",
