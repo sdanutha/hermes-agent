@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/minimal-core.candidate.json",
+    "sha256": "fc6b7bfc3d7b405564fcb0e9845cf8a18a9caf789b27f3e318b1b9e2c878d922",
+    "bytes": 6495
+  },
+  "artifact": {
+    "path": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/minimal-core.html",
+    "sha256": "5bab52a3bd9bad497ce0b2b691b7e7b28aa44f9db504156285d49a2a3d09d030",
+    "bytes": 839333
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/review-minimal-core-2/minimal-core.finalize.json",
+    "summaryReceipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/review-minimal-core-2/minimal-core.finalize-summary.json",
+    "browserCheckReceipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/review-minimal-core-2/minimal-core.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-21T17:31:44.083Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2482,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

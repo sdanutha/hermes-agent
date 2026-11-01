@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "c0c75023-c83e-4042-8d73-7a466924b0dc",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.candidate.json",
+  "output": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.html",
+  "specification": {
+    "sha256": "08a75bbb1a05a884a9daf685eb475b0066a7a0a5ba8517286971b804e38db219",
+    "bytes": 7266
+  },
+  "artifact": {
+    "sha256": "473fa18947a2690638de10e30c7bd8b650fdc2da04cca9c76fa5c0355a4723c5",
+    "bytes": 831115
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "1781af2e-9ea4-45eb-94c3-89136a184c9d",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/minimal-core.candidate.json",
+  "output": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/minimal-core.html",
+  "specification": {
+    "sha256": "fc6b7bfc3d7b405564fcb0e9845cf8a18a9caf789b27f3e318b1b9e2c878d922",
+    "bytes": 6495
+  },
+  "artifact": {
+    "sha256": "5bab52a3bd9bad497ce0b2b691b7e7b28aa44f9db504156285d49a2a3d09d030",
+    "bytes": 839333
+  }
+}

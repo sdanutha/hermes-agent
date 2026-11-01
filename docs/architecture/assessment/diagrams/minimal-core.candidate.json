@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Proposed Minimal Hermes Core (target)",
+    "output": "docs/architecture/assessment/diagrams/minimal-core.html",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "repository": {
+      "url": "https://github.com/sdanutha/hermes-agent.git",
+      "provider": "github",
+      "link_mode": "local-only",
+      "revision": "db203baba58bd31fbf96fbb6932a733a6bf6d5ec"
+    }
+  },
+  "components": [
+    { "id": "entry", "type": "frontend", "label": "Thin entry", "sublabel": "oneshot CLI / library", "pos": [40, 165], "size": [130, 60],
+      "sources": [{ "path": "agent/legacy_cli.py", "line": 1, "end_line": 8, "label": "single-query runner" }, { "path": "hermes_cli/main.py", "line": 3565, "end_line": 3566, "label": "--oneshot" }] },
+    { "id": "sessiondb", "type": "database", "label": "SessionDB", "sublabel": "optional, caller-supplied", "pos": [250, 40], "size": [130, 60],
+      "sources": [{ "path": "run_agent.py", "line": 272, "label": "session_db=None" }, { "path": "hermes_state.py", "line": 463 }] },
+    { "id": "agent", "type": "backend", "label": "AIAgent", "sublabel": "init + facade", "pos": [250, 160], "size": [130, 70],
+      "sources": [{ "path": "run_agent.py", "line": 214, "end_line": 286 }, { "path": "agent/agent_init.py", "line": 1 }] },
+    { "id": "config", "type": "security", "label": "Config + secrets", "sublabel": "scoped, fail-closed", "pos": [250, 290], "size": [130, 60],
+      "sources": [{ "path": "hermes_cli/config.py", "line": 2088, "label": "load_config" }, { "path": "agent/secret_scope.py", "line": 230, "label": "get_secret" }] },
+    { "id": "prompt", "type": "backend", "label": "Prompt + compression", "sublabel": "byte-stable prefix", "pos": [460, 40], "size": [130, 60],
+      "sources": [{ "path": "agent/system_prompt.py", "line": 802, "end_line": 806 }, { "path": "agent/context_compressor.py", "line": 2152 }] },
+    { "id": "loop", "type": "backend", "label": "Turn loop", "sublabel": "phases, retry, budget", "pos": [460, 160], "size": [130, 70],
+      "sources": [{ "path": "agent/conversation_loop.py", "line": 1555, "end_line": 1714 }] },
+    { "id": "transport", "type": "backend", "label": "Chat transport", "sublabel": "chat_completions", "pos": [670, 160], "size": [130, 70],
+      "sources": [{ "path": "agent/transports/chat_completions.py", "line": 516 }, { "path": "agent/transports/base.py", "line": 12, "end_line": 51 }] },
+    { "id": "llm", "type": "external", "label": "LLM endpoint", "sublabel": "OpenAI-compatible", "pos": [880, 165], "size": [130, 60] },
+    { "id": "provider", "type": "backend", "label": "Provider profile", "sublabel": "custom / one bundled", "pos": [670, 290], "size": [130, 60],
+      "sources": [{ "path": "providers/__init__.py", "line": 192 }] },
+    { "id": "executor", "type": "backend", "label": "Tool executor", "sublabel": "one execution path", "pos": [460, 290], "size": [130, 60],
+      "sources": [{ "path": "agent/tool_executor.py", "line": 1865, "label": "sequential" }] },
+    { "id": "registry", "type": "backend", "label": "Tool registry", "sublabel": "toolset filter", "pos": [460, 410], "size": [130, 60],
+      "sources": [{ "path": "tools/registry.py", "line": 121, "end_line": 134, "label": "safe-worker import set" }] },
+    { "id": "coretools", "type": "backend", "label": "File + terminal", "sublabel": "read/write/patch/search", "pos": [460, 530], "size": [130, 60],
+      "sources": [{ "path": "toolsets.py", "line": 11, "end_line": 41 }] },
+    { "id": "approval", "type": "security", "label": "Approval guards", "sublabel": "unchanged", "pos": [670, 530], "size": [130, 60],
+      "sources": [{ "path": "tools/approval.py", "line": 1151 }] },
+    { "id": "env", "type": "security", "label": "Subprocess env", "sublabel": "single env builder", "pos": [460, 650], "size": [130, 60],
+      "sources": [{ "path": "tools/environments/local.py", "line": 378 }] },
+    { "id": "edge", "type": "cloud", "label": "Edge extensions", "sublabel": "plugins, MCP, surfaces", "pos": [880, 410], "size": [130, 60],
+      "sources": [{ "path": "hermes_cli/plugins.py", "line": 1757 }] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Minimal Hermes Core", "wraps": ["sessiondb", "agent", "config", "prompt", "loop", "transport", "provider", "executor", "registry", "coretools", "approval", "env"] }
+  ],
+  "connections": [
+    { "id": "m-entry-agent", "from": "entry", "to": "agent", "label": "construct", "variant": "emphasis" },
+    { "id": "m-agent-loop", "from": "agent", "to": "loop", "label": "run turn", "variant": "emphasis" },
+    { "id": "m-loop-transport", "from": "loop", "to": "transport", "label": "request", "variant": "emphasis" },
+    { "id": "m-transport-llm", "from": "transport", "to": "llm", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "m-agent-db", "from": "agent", "to": "sessiondb", "label": "persist", "variant": "dashed" },
+    { "id": "m-agent-config", "from": "agent", "to": "config", "label": "read" },
+    { "id": "m-loop-prompt", "from": "loop", "to": "prompt", "label": "build once" },
+    { "id": "m-provider-transport", "from": "provider", "to": "transport", "label": "route" },
+    { "id": "m-loop-exec", "from": "loop", "to": "executor", "label": "tool_calls" },
+    { "id": "m-exec-registry", "from": "executor", "to": "registry", "label": "dispatch" },
+    { "id": "m-registry-tools", "from": "registry", "to": "coretools", "label": "handler" },
+    { "id": "m-tools-approval", "from": "coretools", "to": "approval", "label": "guard", "variant": "security" },
+    { "id": "m-tools-env", "from": "coretools", "to": "env", "label": "spawn", "variant": "security" },
+    { "id": "m-edge-registry", "from": "edge", "to": "registry", "label": "register", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Already reachable today", "items": ["enabled_toolsets=[file, terminal], skip_memory, skip_context_files", "Verified E2E against a local fake LLM: 8 tool schemas, 2 calls, 1 tool round", "safe-worker mode imports only file/terminal/process tool modules"] },
+    { "dot": "amber", "title": "What still loads anyway", "items": ["2,466 modules after one turn; gateway, cron and 42 provider plugins included", "System prompt 7.5k chars even with memory and context files off"] },
+    { "dot": "rose", "title": "Kept, not reduced", "items": ["Approval guards, secret scope, subprocess env builder, redaction"] }
+  ]
+}

@@ -1,0 +1,661 @@
+{
+ "schema_version": 1,
+ "diagram_type": "architecture",
+ "meta": {
+  "title": "Hermes Agent \u2014 Runtime Architecture Overview",
+  "output": "docs/architecture/assessment/diagrams/architecture-overview.html",
+  "quality_profile": "showcase",
+  "locale": "en",
+  "repository": {
+   "url": "https://github.com/sdanutha/hermes-agent.git",
+   "provider": "github",
+   "link_mode": "local-only",
+   "revision": "db203baba58bd31fbf96fbb6932a733a6bf6d5ec"
+  }
+ },
+ "components": [
+  {
+   "id": "cli",
+   "type": "frontend",
+   "label": "hermes CLI",
+   "sublabel": "REPL, oneshot, subcmds",
+   "pos": [
+    40,
+    100
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "hermes_cli/main.py",
+     "line": 3470,
+     "end_line": 3582,
+     "label": "main()"
+    },
+    {
+     "path": "pyproject.toml",
+     "line": 563,
+     "end_line": 566,
+     "label": "console scripts"
+    }
+   ]
+  },
+  {
+   "id": "tui",
+   "type": "frontend",
+   "label": "TUI / Desktop / Web",
+   "sublabel": "tui_gateway JSON-RPC",
+   "pos": [
+    40,
+    220
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "tui_gateway/entry.py",
+     "line": 291,
+     "label": "main()"
+    },
+    {
+     "path": "hermes_cli/web_server.py",
+     "line": 218,
+     "label": "FastAPI dashboard"
+    }
+   ]
+  },
+  {
+   "id": "gw",
+   "type": "frontend",
+   "label": "Messaging gateway",
+   "sublabel": "adapters + cron ticker",
+   "pos": [
+    40,
+    340
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "gateway/run.py",
+     "line": 3341,
+     "end_line": 3346,
+     "label": "GatewayRunner (19 mixins)"
+    },
+    {
+     "path": "gateway/run_bootstrap.py",
+     "line": 380,
+     "end_line": 460,
+     "label": "cron ticker start"
+    }
+   ]
+  },
+  {
+   "id": "acp",
+   "type": "frontend",
+   "label": "ACP adapter",
+   "sublabel": "editor integration",
+   "pos": [
+    40,
+    460
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "acp_adapter/entry.py",
+     "line": 163,
+     "label": "main()"
+    }
+   ]
+  },
+  {
+   "id": "agent",
+   "type": "backend",
+   "label": "AIAgent facade",
+   "sublabel": "86 params, 14 mixins",
+   "pos": [
+    250,
+    270
+   ],
+   "size": [
+    130,
+    90
+   ],
+   "sources": [
+    {
+     "path": "run_agent.py",
+     "line": 214,
+     "end_line": 286,
+     "label": "class AIAgent"
+    }
+   ]
+  },
+  {
+   "id": "memskills",
+   "type": "database",
+   "label": "Memory + Skills",
+   "sublabel": "MEMORY/USER/SKILL.md",
+   "pos": [
+    460,
+    40
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "tools/memory_tool.py",
+     "line": 1,
+     "end_line": 5,
+     "label": "frozen snapshot"
+    },
+    {
+     "path": "agent/memory_manager.py",
+     "line": 196,
+     "end_line": 200
+    },
+    {
+     "path": "agent/prompt_builder.py",
+     "line": 1245,
+     "label": "skills index"
+    }
+   ]
+  },
+  {
+   "id": "context",
+   "type": "backend",
+   "label": "Prompt + compression",
+   "sublabel": "byte-stable prompt",
+   "pos": [
+    460,
+    160
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "agent/system_prompt.py",
+     "line": 802,
+     "end_line": 806,
+     "label": "build_system_prompt"
+    },
+    {
+     "path": "agent/context_compressor.py",
+     "line": 2152,
+     "label": "ContextCompressor"
+    }
+   ]
+  },
+  {
+   "id": "loop",
+   "type": "backend",
+   "label": "Turn loop",
+   "sublabel": "phases + retries",
+   "pos": [
+    460,
+    280
+   ],
+   "size": [
+    130,
+    70
+   ],
+   "sources": [
+    {
+     "path": "agent/conversation_loop.py",
+     "line": 1555,
+     "end_line": 1714,
+     "label": "_run_conversation_turn"
+    },
+    {
+     "path": "agent/conversation_loop.py",
+     "line": 1505,
+     "end_line": 1534,
+     "label": "API retry loop"
+    }
+   ]
+  },
+  {
+   "id": "transport",
+   "type": "backend",
+   "label": "LLM transports",
+   "sublabel": "5 api_mode families",
+   "pos": [
+    670,
+    280
+   ],
+   "size": [
+    130,
+    70
+   ],
+   "sources": [
+    {
+     "path": "agent/transports/base.py",
+     "line": 12,
+     "end_line": 51,
+     "label": "ProviderTransport ABC"
+    },
+    {
+     "path": "agent/turn_api_call.py",
+     "line": 67,
+     "label": "perform_api_call"
+    }
+   ]
+  },
+  {
+   "id": "llm",
+   "type": "external",
+   "label": "LLM provider API",
+   "sublabel": "OpenAI-compatible etc.",
+   "pos": [
+    880,
+    285
+   ],
+   "size": [
+    130,
+    60
+   ]
+  },
+  {
+   "id": "provider",
+   "type": "backend",
+   "label": "Provider resolution",
+   "sublabel": "42 provider profiles",
+   "pos": [
+    670,
+    410
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "providers/__init__.py",
+     "line": 192,
+     "label": "get_provider_profile"
+    },
+    {
+     "path": "hermes_cli/runtime_provider.py",
+     "line": 1041,
+     "label": "resolve_runtime_provider"
+    }
+   ]
+  },
+  {
+   "id": "sessiondb",
+   "type": "database",
+   "label": "SessionDB",
+   "sublabel": "state.db, schema v32",
+   "pos": [
+    250,
+    530
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "hermes_state.py",
+     "line": 463,
+     "end_line": 468,
+     "label": "class SessionDB"
+    },
+    {
+     "path": "hermes_state_common.py",
+     "line": 289,
+     "label": "SCHEMA_VERSION"
+    },
+    {
+     "path": "run_agent.py",
+     "line": 272,
+     "label": "session_db param"
+    }
+   ]
+  },
+  {
+   "id": "executor",
+   "type": "backend",
+   "label": "Tool executor",
+   "sublabel": "concurrent/sequential",
+   "pos": [
+    460,
+    410
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "agent/tool_executor.py",
+     "line": 1585,
+     "label": "concurrent"
+    },
+    {
+     "path": "agent/tool_executor.py",
+     "line": 1865,
+     "label": "sequential"
+    },
+    {
+     "path": "agent/inline_tool_executors.py",
+     "line": 253,
+     "end_line": 313,
+     "label": "inline tools"
+    }
+   ]
+  },
+  {
+   "id": "registry",
+   "type": "backend",
+   "label": "Tool registry",
+   "sublabel": "88 tools, 59 toolsets",
+   "pos": [
+    460,
+    530
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "tools/registry.py",
+     "line": 121,
+     "end_line": 161,
+     "label": "discover_builtin_tools"
+    },
+    {
+     "path": "toolsets.py",
+     "line": 11,
+     "end_line": 41,
+     "label": "_HERMES_CORE_TOOLS"
+    },
+    {
+     "path": "model_tools.py",
+     "line": 215,
+     "end_line": 245,
+     "label": "get_tool_definitions"
+    }
+   ]
+  },
+  {
+   "id": "plugins",
+   "type": "backend",
+   "label": "Plugin loader",
+   "sublabel": "registers extensions",
+   "pos": [
+    880,
+    530
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "hermes_cli/plugins.py",
+     "line": 1757,
+     "label": "discover_plugins"
+    }
+   ]
+  },
+  {
+   "id": "tools",
+   "type": "backend",
+   "label": "File + terminal",
+   "sublabel": "core tool handlers",
+   "pos": [
+    460,
+    650
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "tools/terminal_tool.py",
+     "line": 123,
+     "end_line": 125,
+     "label": "guard import"
+    },
+    {
+     "path": "model_tools.py",
+     "line": 873,
+     "label": "handle_function_call"
+    }
+   ]
+  },
+  {
+   "id": "approval",
+   "type": "security",
+   "label": "Approval guards",
+   "sublabel": "deny/floor/prompt",
+   "pos": [
+    670,
+    650
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "tools/approval.py",
+     "line": 1095,
+     "end_line": 1216,
+     "label": "command/code guards"
+    }
+   ]
+  },
+  {
+   "id": "env",
+   "type": "security",
+   "label": "Execution env",
+   "sublabel": "local, docker, ssh",
+   "pos": [
+    460,
+    770
+   ],
+   "size": [
+    130,
+    60
+   ],
+   "sources": [
+    {
+     "path": "tools/environments/local.py",
+     "line": 378,
+     "label": "build_subprocess_env"
+    }
+   ]
+  }
+ ],
+ "boundaries": [
+  {
+   "kind": "region",
+   "label": "Agent runtime (in-process library)",
+   "wraps": [
+    "agent",
+    "context",
+    "loop",
+    "transport",
+    "executor",
+    "provider"
+   ]
+  },
+  {
+   "kind": "region",
+   "label": "Tool layer",
+   "wraps": [
+    "registry",
+    "tools",
+    "approval",
+    "env"
+   ]
+  }
+ ],
+ "connections": [
+  {
+   "id": "cli-agent",
+   "from": "cli",
+   "to": "agent"
+  },
+  {
+   "id": "tui-agent",
+   "from": "tui",
+   "to": "agent"
+  },
+  {
+   "id": "gw-agent",
+   "from": "gw",
+   "to": "agent"
+  },
+  {
+   "id": "acp-agent",
+   "from": "acp",
+   "to": "agent"
+  },
+  {
+   "id": "agent-loop",
+   "from": "agent",
+   "to": "loop",
+   "label": "run turn",
+   "variant": "emphasis"
+  },
+  {
+   "id": "loop-context",
+   "from": "loop",
+   "to": "context",
+   "label": "prompt / compact"
+  },
+  {
+   "id": "context-mem",
+   "from": "context",
+   "to": "memskills",
+   "label": "read snapshot"
+  },
+  {
+   "id": "loop-transport",
+   "from": "loop",
+   "to": "transport",
+   "label": "request",
+   "variant": "emphasis"
+  },
+  {
+   "id": "transport-llm",
+   "from": "transport",
+   "to": "llm",
+   "label": "HTTPS",
+   "variant": "emphasis"
+  },
+  {
+   "id": "provider-transport",
+   "from": "provider",
+   "to": "transport",
+   "label": "route"
+  },
+  {
+   "id": "plugins-provider",
+   "from": "plugins",
+   "to": "provider",
+   "label": "register",
+   "variant": "dashed"
+  },
+  {
+   "id": "loop-executor",
+   "from": "loop",
+   "to": "executor",
+   "label": "tool_calls"
+  },
+  {
+   "id": "executor-registry",
+   "from": "executor",
+   "to": "registry",
+   "label": "dispatch"
+  },
+  {
+   "id": "plugins-registry",
+   "from": "plugins",
+   "to": "registry",
+   "label": "register_tool",
+   "variant": "dashed"
+  },
+  {
+   "id": "registry-tools",
+   "from": "registry",
+   "to": "tools",
+   "label": "handler"
+  },
+  {
+   "id": "tools-approval",
+   "from": "tools",
+   "to": "approval",
+   "label": "guard",
+   "variant": "security"
+  },
+  {
+   "id": "tools-env",
+   "from": "tools",
+   "to": "env",
+   "label": "spawn",
+   "variant": "security"
+  },
+  {
+   "id": "agent-sessiondb",
+   "from": "agent",
+   "to": "sessiondb",
+   "label": "persist"
+  }
+ ],
+ "cards": [
+  {
+   "dot": "emerald",
+   "title": "Verified minimal path",
+   "items": [
+    "E2E run: AIAgent + file/terminal toolsets + fake OpenAI server",
+    "2 streamed calls, read_file executed, final answer returned",
+    "No SessionDB unless the caller passes session_db"
+   ]
+  },
+  {
+   "dot": "amber",
+   "title": "Measured coupling",
+   "items": [
+    "import run_agent: 1,181 modules, ~1.3 s",
+    "Eager import of 42 provider, 11 web, 8 image_gen plugins",
+    "73 api_mode branches outside agent/transports"
+   ]
+  },
+  {
+   "dot": "rose",
+   "title": "Safety controls (keep)",
+   "items": [
+    "Approval guards gate terminal / execute_code / writes",
+    "One subprocess env builder for every spawn",
+    "Secret scope fails closed under multiplex"
+   ]
+  },
+  {
+   "dot": "slate",
+   "title": "Omitted from this view",
+   "items": [
+    "Cron, kanban, delegation, MCP, browser, media tools",
+    "Update/PM installer, observability, i18n",
+    "See component-inventory.md"
+   ]
+  }
+ ]
+}

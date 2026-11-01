@@ -1,0 +1,393 @@
+{
+ "schema_version": 2,
+ "diagram_type": "workflow",
+ "meta": {
+  "title": "Hermes Agent \u2014 One Conversation Turn",
+  "output": "docs/architecture/assessment/diagrams/agent-turn.html",
+  "quality_profile": "showcase",
+  "locale": "en",
+  "repository": {
+   "url": "https://github.com/sdanutha/hermes-agent.git",
+   "provider": "github",
+   "link_mode": "local-only",
+   "revision": "db203baba58bd31fbf96fbb6932a733a6bf6d5ec"
+  }
+ },
+ "lanes": [
+  {
+   "id": "caller",
+   "label": "Caller surface"
+  },
+  {
+   "id": "loop",
+   "label": "Turn loop"
+  },
+  {
+   "id": "llm",
+   "label": "LLM call"
+  },
+  {
+   "id": "tools",
+   "label": "Tool round"
+  },
+  {
+   "id": "recovery",
+   "label": "Recovery",
+   "variant": "exception"
+  }
+ ],
+ "phases": [
+  {
+   "id": "setup",
+   "label": "Setup",
+   "fromCol": 0,
+   "toCol": 1
+  },
+  {
+   "id": "iterate",
+   "label": "Iterate until text",
+   "fromCol": 2,
+   "toCol": 4,
+   "variant": "emphasis"
+  },
+  {
+   "id": "finish",
+   "label": "Finish",
+   "fromCol": 5,
+   "toCol": 5
+  }
+ ],
+ "mainPath": [
+  "caller",
+  "context",
+  "prep",
+  "apicall",
+  "intake",
+  "finaltext",
+  "finalize"
+ ],
+ "nodes": [
+  {
+   "id": "caller",
+   "lane": "caller",
+   "col": 0,
+   "type": "frontend",
+   "label": "AIAgent.run_conversation",
+   "sublabel": "durable turn lease",
+   "sources": [
+    {
+     "path": "agent/turn_facade.py",
+     "line": 22,
+     "end_line": 75,
+     "label": "lease + forward"
+    },
+    {
+     "path": "agent/turn_facade_lease.py",
+     "line": 297,
+     "label": "admit_durable_turn_lease"
+    },
+    {
+     "path": "agent/conversation_loop.py",
+     "line": 1717,
+     "end_line": 1774
+    }
+   ]
+  },
+  {
+   "id": "context",
+   "lane": "loop",
+   "col": 1,
+   "type": "backend",
+   "label": "Turn context",
+   "sublabel": "restore or build prompt",
+   "sources": [
+    {
+     "path": "agent/turn_context.py",
+     "line": 1036,
+     "label": "build_turn_context"
+    },
+    {
+     "path": "agent/conversation_loop.py",
+     "line": 749,
+     "label": "_restore_or_build_system_prompt"
+    }
+   ]
+  },
+  {
+   "id": "prep",
+   "lane": "loop",
+   "col": 2,
+   "type": "backend",
+   "label": "Iteration prep",
+   "sublabel": "assemble + preflight",
+   "sources": [
+    {
+     "path": "agent/turn_iteration_prep.py",
+     "line": 144,
+     "label": "prepare_iteration"
+    },
+    {
+     "path": "agent/turn_request_assembly.py",
+     "line": 106
+    },
+    {
+     "path": "agent/turn_preflight_gate.py",
+     "line": 20,
+     "end_line": 31
+    }
+   ]
+  },
+  {
+   "id": "compact",
+   "lane": "recovery",
+   "col": 2,
+   "type": "messagebus",
+   "label": "Compaction",
+   "sublabel": "only cache break",
+   "sources": [
+    {
+     "path": "agent/turn_context_compaction.py",
+     "line": 43
+    },
+    {
+     "path": "agent/context_compressor.py",
+     "line": 2152
+    }
+   ]
+  },
+  {
+   "id": "apicall",
+   "lane": "llm",
+   "col": 3,
+   "type": "cloud",
+   "label": "API retry loop",
+   "sublabel": "build, call, check",
+   "sources": [
+    {
+     "path": "agent/conversation_loop.py",
+     "line": 1505,
+     "end_line": 1534
+    },
+    {
+     "path": "agent/turn_api_call.py",
+     "line": 67
+    },
+    {
+     "path": "agent/turn_response_check.py",
+     "line": 92
+    }
+   ]
+  },
+  {
+   "id": "apierror",
+   "lane": "recovery",
+   "col": 3,
+   "type": "security",
+   "label": "API error handler",
+   "sublabel": "fallback, rotate, compress",
+   "sources": [
+    {
+     "path": "agent/turn_api_error.py",
+     "line": 52,
+     "end_line": 62
+    }
+   ]
+  },
+  {
+   "id": "intake",
+   "lane": "loop",
+   "col": 4,
+   "type": "backend",
+   "label": "Response intake",
+   "sublabel": "normalize message",
+   "sources": [
+    {
+     "path": "agent/turn_response_intake.py",
+     "line": 120
+    }
+   ]
+  },
+  {
+   "id": "toolround",
+   "lane": "tools",
+   "col": 4,
+   "type": "backend",
+   "label": "Tool round",
+   "sublabel": "persist, then execute",
+   "sources": [
+    {
+     "path": "agent/turn_tool_round.py",
+     "line": 49,
+     "end_line": 59
+    },
+    {
+     "path": "agent/tool_executor.py",
+     "line": 1585
+    }
+   ]
+  },
+  {
+   "id": "guard",
+   "lane": "tools",
+   "col": 5,
+   "type": "security",
+   "label": "Approval guards",
+   "sublabel": "deny, floor, prompt",
+   "sources": [
+    {
+     "path": "tools/approval.py",
+     "line": 1151,
+     "label": "check_all_command_guards"
+    }
+   ]
+  },
+  {
+   "id": "finaltext",
+   "lane": "loop",
+   "col": 5,
+   "type": "backend",
+   "label": "Final text",
+   "sublabel": "stop gates",
+   "sources": [
+    {
+     "path": "agent/turn_final_response.py",
+     "line": 56
+    }
+   ]
+  },
+  {
+   "id": "finalize",
+   "lane": "caller",
+   "col": 5,
+   "type": "frontend",
+   "label": "finalize_turn",
+   "sublabel": "result dict",
+   "sources": [
+    {
+     "path": "agent/turn_finalizer.py",
+     "line": 525
+    }
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "id": "e-caller-context",
+   "from": "caller",
+   "to": "context",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e-context-prep",
+   "from": "context",
+   "to": "prep",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e-prep-compact",
+   "from": "prep",
+   "to": "compact",
+   "label": "over budget",
+   "role": "branch"
+  },
+  {
+   "id": "e-compact-prep",
+   "from": "compact",
+   "to": "prep",
+   "label": "retry",
+   "role": "return",
+   "variant": "dashed"
+  },
+  {
+   "id": "e-prep-api",
+   "from": "prep",
+   "to": "apicall",
+   "label": "request",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e-api-error",
+   "from": "apicall",
+   "to": "apierror",
+   "label": "exception",
+   "role": "error",
+   "variant": "security"
+  },
+  {
+   "id": "e-error-api",
+   "from": "apierror",
+   "to": "apicall",
+   "label": "retry",
+   "role": "return",
+   "variant": "dashed"
+  },
+  {
+   "id": "e-api-intake",
+   "from": "apicall",
+   "to": "intake",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e-intake-tools",
+   "from": "intake",
+   "to": "toolround",
+   "label": "tool_calls",
+   "role": "branch"
+  },
+  {
+   "id": "e-tools-guard",
+   "from": "toolround",
+   "to": "guard",
+   "label": "risky call",
+   "variant": "security"
+  },
+  {
+   "id": "e-tools-prep",
+   "from": "toolround",
+   "to": "prep",
+   "label": "next iteration",
+   "role": "return",
+   "variant": "dashed"
+  },
+  {
+   "id": "e-intake-final",
+   "from": "intake",
+   "to": "finaltext",
+   "label": "text",
+   "variant": "emphasis"
+  },
+  {
+   "id": "e-final-finalize",
+   "from": "finaltext",
+   "to": "finalize",
+   "variant": "emphasis"
+  }
+ ],
+ "cards": [
+  {
+   "dot": "cyan",
+   "title": "Loop contract",
+   "items": [
+    "Bounded by max_iterations and the iteration budget, plus one grace call",
+    "Each phase returns a verdict: return, break, continue or fall through"
+   ]
+  },
+  {
+   "dot": "rose",
+   "title": "Invariants to keep",
+   "items": [
+    "System prompt is byte-stable; compaction is the only cache break",
+    "Tool call is persisted before it executes (resume safety)",
+    "Fallback activation re-runs the preflight against the new context window"
+   ]
+  },
+  {
+   "dot": "amber",
+   "title": "Coupling inside the loop",
+   "items": [
+    "MoA, Nous billing, Copilot, Ollama, voice and codex-app-server paths live in loop phases",
+    "codex_app_server mode hands the whole turn to a subprocess"
+   ]
+  }
+ ]
+}

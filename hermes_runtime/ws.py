@@ -602,10 +602,6 @@ async def handle_ws(ws: Any, *, auth_identity: dict | None = None, subprotocol: 
             except Exception:
                 _log.exception("ws browser-controller disconnect failed peer=%s", peer)
             transport.close()
-            try:
-                await asyncio.to_thread(server._release_wake_for_transport, transport)
-            except Exception:
-                _log.exception("ws wake-word teardown failed peer=%s", peer)
             # The single WS-disconnect teardown path: reap sessions this transport owned (close_on_disconnect
             # sidecars) or detach the rest to the drop sentinel so later emits don't hit a closed socket; detached
             # ones go to the grace-windowed orphan reaper (a quick resume cancels it). Offloaded: worker.close()

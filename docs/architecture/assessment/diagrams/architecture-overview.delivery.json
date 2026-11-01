@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "a00410a1-6772-4c06-8f04-97fe71223fff",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.candidate.json",
+  "output": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.html",
+  "specification": {
+    "sha256": "1186cb63180ed3c9035d4e7867056b2e8e24d20c60a0ee08bcd0f5c032917a64",
+    "bytes": 11136
+  },
+  "artifact": {
+    "sha256": "a06a023c8f7c7c22715be402c1a063020f7ca874059b5900342fd210081210ef",
+    "bytes": 848813
+  }
+}

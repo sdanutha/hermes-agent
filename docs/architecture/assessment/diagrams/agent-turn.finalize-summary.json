@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "workflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.candidate.json",
+    "sha256": "1bcd1b8a3d9f688c659f5a389095127df1f253c710a702794047c817661d1dc0",
+    "bytes": 6115
+  },
+  "artifact": {
+    "path": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.html",
+    "sha256": "ee35a233b25006016ff73c2110a78236480685288fe88f759311097d2c6352a4",
+    "bytes": 830906
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.finalize.json",
+    "summaryReceipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.finalize-summary.json",
+    "browserCheckReceipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/agent-turn.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-21T17:31:44.083Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2321,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.candidate.json",
+    "sha256": "1186cb63180ed3c9035d4e7867056b2e8e24d20c60a0ee08bcd0f5c032917a64",
+    "bytes": 11136
+  },
+  "artifact": {
+    "path": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.html",
+    "sha256": "a06a023c8f7c7c22715be402c1a063020f7ca874059b5900342fd210081210ef",
+    "bytes": 848813
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.finalize.json",
+    "summaryReceipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.finalize-summary.json",
+    "browserCheckReceipt": "/Users/sdanutha/Documents/Works/hermes-agent/docs/architecture/assessment/diagrams/architecture-overview.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-21T17:31:44.083Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 6504,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

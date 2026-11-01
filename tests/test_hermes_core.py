@@ -1,5 +1,6 @@
 """Headless entry point through the real owner, model loop, tools and session store."""
 import asyncio
+import errno
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
@@ -103,7 +104,8 @@ def exercise_http(root, env, peer, port):
 
 
 @pytest.mark.platforms('posix')
-def test_headless_execution_cancellation_persistence_and_shutdown(tmp_path):
+@pytest.mark.parametrize('terminal', [False, True])
+def test_headless_execution_cancellation_persistence_and_shutdown(tmp_path, terminal):
     root = Path(__file__).resolve().parents[1]
     home, user = tmp_path / 'state', tmp_path / 'user'
     home.mkdir(mode=0o700)
@@ -152,11 +154,18 @@ def test_headless_execution_cancellation_persistence_and_shutdown(tmp_path):
                 print(log.read())
                 raise
             exercise_http(root, env, peer, api_port)
-            chat = subprocess.run([sys.executable, '-m', 'hermes_core', 'chat', '-q', 'SAY_OK',
-                                   '--provider', 'custom', '--model', 'fixture', '--base-url', url],
-                                  env=env, cwd=root, capture_output=True, text=True, timeout=45, check=False)
+            command = [sys.executable, '-m', 'hermes_core', 'chat', '-q', 'SAY_OK',
+                       '--provider', 'custom', '--model', 'fixture', '--base-url', url]
+            if terminal:
+                chat = terminal_chat(command, env, root)
+            else:
+                chat = subprocess.run(command, env=env, cwd=root, capture_output=True,
+                                      text=True, timeout=45, check=False)
             assert chat.returncode == 0, chat.stdout + chat.stderr
             assert 'CORE_OK' in chat.stdout
+            log.flush()
+            log.seek(0)
+            assert 'ws wake-word teardown failed' not in log.read()
 
             proc.terminate()
             # The existing owner treats unmarked SIGTERM as an external stop (exit 1),
@@ -173,3 +182,36 @@ def test_headless_execution_cancellation_persistence_and_shutdown(tmp_path):
     from hermes_state import SessionDB
     with SessionDB(home / 'state.db', read_only=True) as db:
         assert any(m['role'] == 'tool' for m in db.get_messages(sid))
+
+
+def terminal_chat(command, env, cwd):
+    """Exercise the CLI with both stdin and stdout connected to a real terminal."""
+    master, slave = os.openpty()
+    chunks = []
+
+    def read_output():
+        while True:
+            try:
+                chunk = os.read(master, 65536)
+            except OSError as exc:
+                if exc.errno == errno.EIO:  # PTYs signal EOF this way on Linux.
+                    return
+                raise
+            if not chunk:
+                return
+            chunks.append(chunk)
+
+    reader = threading.Thread(target=read_output, daemon=True)
+    reader.start()
+    try:
+        try:
+            result = subprocess.run(command, env=env, cwd=cwd, stdin=slave, stdout=slave,
+                                    stderr=slave, timeout=45, check=False)
+        finally:
+            os.close(slave)
+            reader.join(timeout=5)
+        assert not reader.is_alive(), 'Terminal output reader did not finish'
+        return subprocess.CompletedProcess(command, result.returncode,
+                                           b''.join(chunks).decode('utf-8'), '')
+    finally:
+        os.close(master)
